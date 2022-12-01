@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on Reion's Blog</title><link>https://reionwong.github.io/categories/qt/</link><description>Recent content in Qt on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Apr 2022 14:28:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>Qt QIconLoader</title><link>https://reionwong.github.io/p/qt-qiconloader/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qt-qiconloader/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on Reion's Blog</title><link>https://reionwong.github.io/categories/qt/</link><description>Recent content in Qt on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Apr 2022 14:28:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>QIconLoader 简单分析</title><link>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
 &lt;p>QIconLoader 被设计成单实例，以便让其他模块方便使用，初始化时候首先会获取系统主题名称，如果提供主题为空则继续获取 systemFallbackThemeName()，并且会从 IconEngineFactoryLoader 的插件中查看是否支持 svg 格式。&lt;/p>
 &lt;p>在 Linux 中使用 Qt 开发 DE 的都会实现一个 Qt PlatformTheme 的插件，通过这个插件可以达到主题动态修改，在 QPlatformTheme 中重载实现，返回 themeHint() 中的 QPlatformTheme::SystemIconThemeName。&lt;/p>
 &lt;p>QIconLoader 包含以下模块：&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558.png"
 width="1166"
 height="513"
-srcset="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="227"
 data-flex-basis="545px"
 >&lt;/p>
-&lt;h1 id="查找图标主题位置">查找图标主题位置&lt;/h1>
+&lt;h2 id="查找图标主题位置">查找图标主题位置&lt;/h2>
 &lt;p>通过访问 &lt;code>QPlatformTheme::themeHint(QPlatformTheme::IconThemeSearchPaths)&lt;/code> 获取一个字符串 List。&lt;/p>
-&lt;h1 id="数据结构">数据结构&lt;/h1>
+&lt;h2 id="数据结构">数据结构&lt;/h2>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
@@ -80,12 +80,12 @@ data-flex-basis="545px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;h1 id="qiconcachegtkreader">QIconCacheGtkReader&lt;/h1>
-&lt;p>Gtk 图标缓冲，用于方便查找图标。&lt;/p>
-&lt;h1 id="qicontheme">QIconTheme&lt;/h1>
+&lt;/div>&lt;h2 id="qiconcachegtkreader">QIconCacheGtkReader&lt;/h2>
+&lt;p>Gtk 图标缓存，用于方便查找图标。&lt;/p>
+&lt;h2 id="qicontheme">QIconTheme&lt;/h2>
 &lt;p>遍历主题路径下的文件夹，匹配到相应的主题&lt;/p>
 &lt;p>寻找图标的逻辑是遍历所有子文件夹寻找图标，通过图标名称和后缀 (.png 和 .svg) 判断文件是否存在，如果存在表示已经寻找到。&lt;/p>
-&lt;h1 id="位置">位置&lt;/h1>
+&lt;h2 id="位置">位置&lt;/h2>
 &lt;ul>
 &lt;li>src/gui/image/qiconloader_p.h&lt;/li>
 &lt;li>src/gui/image/qiconloader.cpp&lt;/li>
