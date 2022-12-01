@@ -1,0 +1,381 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on Reion's Blog</title><link>https://reionwong.github.io/categories/qt/</link><description>Recent content in Qt on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Thu, 08 Nov 2018 13:48:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>记一次 QMimeData 在龙芯上的崩溃</title><link>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</link><pubDate>Thu, 08 Nov 2018 13:48:38 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</guid><description>&lt;p>deepin-editor 在龙芯下合并 tabbar 的时候导致崩溃，于是我就拿起了 gdb 调试，以下是栈信息：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Thread 1 &amp;#34;deepin-editor&amp;#34; received signal SIGBUS, Bus error.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">strcmp () at ../sysdeps/mips/strcmp.S:222
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">222 ../sysdeps/mips/strcmp.S: 没有那个文件或目录.
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">(gdb) bt
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#0 strcmp () at ../sysdeps/mips/strcmp.S:222
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#1 0x000000012008419c in EditWrapper::qt_metacast (this=0x1202c59d0,
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> _clname=0xffffffffffffffff &amp;lt;error: Cannot access memory at address 0xffffffffffffffff&amp;gt;)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> at /home/deepin/build/buildpkg/deepin-editor/deepin-editor-1.1.1/obj-mips64el-linux-gnuabi64/deepin-editor_automoc.dir/moc_editwrapper_44KGO3GEJEDNED.cpp:77
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#2 0x000000fff69d6fec in QObjectPrivate::~QObjectPrivate() () from /usr/lib/mips64el-linux-gnuabi64/libQt5Core.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#3 0x000000fff69d2b84 in ?? () from /usr/lib/mips64el-linux-gnuabi64/libQt5Core.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#4 0x000000fff69e066c in QObject::~QObject() () from /usr/lib/mips64el-linux-gnuabi64/libQt5Core.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#5 0x000000fff69ceb90 in QMimeData::~QMimeData() () from /usr/lib/mips64el-linux-gnuabi64/libQt5Core.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#6 0x000000fff69cebc4 in QMimeData::~QMimeData() () from /usr/lib/mips64el-linux-gnuabi64/libQt5Core.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">#7 0x000000fff6d5c864 in QDrag::~QDrag() () from /usr/lib/mips64el-linux-gnuabi64/libQt5Gui.so.5
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Backtrace stopped: frame did not save the PC
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看出元对象访问不了，原因就是 qt_metacast，然后我就知道问题出在哪了。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">mimeData-&amp;gt;setData(&amp;#34;dedit/tabbar&amp;#34;, tabName.toUtf8());
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mimeData-&amp;gt;setUserData(0, (QObjectUserData *) wrapper);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">mimeData-&amp;gt;removeFormat(&amp;#34;text/plain&amp;#34;);
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>果然是 setUserData() 的问题，wrapper 是一个对象的指针，然后强转换为 QObjectUserData，在 X86 平台上是没有读取不到的问题，最后我还是使用了 QObject 的 property 特性来解决了。&lt;/p>
+&lt;p>传入方法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">mimeData-&amp;gt;setProperty(&amp;#34;wrapper&amp;#34;, QVariant::fromValue(static_cast&amp;lt;void *&amp;gt;(wrapper)));
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>读取方法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">QVariant pVar = source-&amp;gt;property(&amp;#34;wrapper&amp;#34;);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">EditWrapper *wrapper = static_cast&amp;lt;EditWrapper *&amp;gt;(pVar.value&amp;lt;void *&amp;gt;());
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="提交">提交&lt;/h2>
+&lt;p>&lt;a class="link" href="https://github.com/linuxdeepin/deepin-editor/commit/0dc5d62c300e102cf62d397e7163d8223b6a21af" target="_blank" rel="noopener"
+>fix: drag and drop crash under loongson. · linuxdeepin/deepin-editor@0dc5d62 · GitHub&lt;/a>&lt;/p></description></item><item><title>解决 QToolTip 延迟隐藏问题</title><link>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 03 Nov 2018 08:40:42 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</guid><description>&lt;p>QToolTip 内部有一个继承 QLabel 的 QTipLabel，它把 Window flag 设为：Qt::ToolTip、Qt::BypassGraphicsProxyWidget，有两个 QBasicTimer 计时器：hideTimer，expireTimer，是用来做淡入淡出的效果，GTK 的 ToolTip 是没有这种延迟的，所以体验更好，延迟会造成一种心理作用，会认为是程序加载慢，很不爽。&lt;/p>
+&lt;p>然后某一天看到 @Blumia 同学提交文件管理器的 PR，也是把这个不清真的延迟去掉：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="kt">bool&lt;/span> &lt;span class="n">ListItemDelegate&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">helpEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QHelpEvent&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">QAbstractItemView&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">view&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QStyleOptionViewItem&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">option&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QModelIndex&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">index&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">event&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">type&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">QEvent&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ToolTip&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">tooltip&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">index&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ToolTipRole&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">tooltip&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isEmpty&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QWidgetList&lt;/span> &lt;span class="n">qwl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QApplication&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">topLevelWidgets&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">QWidget&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="nl">qw&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="n">qwl&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">qw&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">metaObject&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">className&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">QStringLiteral&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;QTipLabel&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">qw&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QToolTip&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">showText&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">event&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">globalPos&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="n">tooltip&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">view&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">ListItemDelegate&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">helpEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">event&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">view&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">option&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">index&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>通过 Qt 提供的 Meta-Object 机制，找到 QTipLabel 并直接关闭&lt;/p></description></item><item><title>解析 Linux 最近使用文件列表</title><link>https://reionwong.github.io/p/singals-slots-in-cpp/</link><pubDate>Mon, 15 Oct 2018 20:00:28 +0800</pubDate><guid>https://reionwong.github.io/p/singals-slots-in-cpp/</guid><description>&lt;p>关于最近使用文件，freedesktop 定制了 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
+>recent-file-spec&lt;/a>，为 X 桌面提供统一的标准，广泛被 Gnome、KDE 所使用，最近在深度文件管理器加上这个功能，所以了解了一下这个协议。&lt;/p>
+&lt;p>最近文件协议存储在 ~/.local/share/recently-used.xbel 里边，它用 xml 格式来进行存储，基本格式如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;xbel&lt;/span> &lt;span class="na">version=&lt;/span>&lt;span class="s">&amp;#34;1.0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">xmlns:bookmark=&lt;/span>&lt;span class="s">&amp;#34;http://www.freedesktop.org/standards/desktop-bookmarks&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">xmlns:mime=&lt;/span>&lt;span class="s">&amp;#34;http://www.freedesktop.org/standards/shared-mime-info&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;file:///home/rekols/blog/db.json&amp;#34;&lt;/span> &lt;span class="na">added=&lt;/span>&lt;span class="s">&amp;#34;2018-10-15T05:22:32Z&amp;#34;&lt;/span> &lt;span class="na">modified=&lt;/span>&lt;span class="s">&amp;#34;2018-10-15T06:31:11Z&amp;#34;&lt;/span> &lt;span class="na">visited=&lt;/span>&lt;span class="s">&amp;#34;2018-10-15T05:22:32Z&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;info&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;metadata&lt;/span> &lt;span class="na">owner=&lt;/span>&lt;span class="s">&amp;#34;http://freedesktop.org&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;mime:mime-type&lt;/span> &lt;span class="na">type=&lt;/span>&lt;span class="s">&amp;#34;application/json&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:groups&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:group&amp;gt;&lt;/span>gedit&lt;span class="nt">&amp;lt;/bookmark:group&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark:groups&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:applications&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:application&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;gedit&amp;#34;&lt;/span> &lt;span class="na">exec=&lt;/span>&lt;span class="s">&amp;#34;&amp;amp;apos;gedit %u&amp;amp;apos;&amp;#34;&lt;/span> &lt;span class="na">modified=&lt;/span>&lt;span class="s">&amp;#34;2018-10-15T06:31:11Z&amp;#34;&lt;/span> &lt;span class="na">count=&lt;/span>&lt;span class="s">&amp;#34;2&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark:applications&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/metadata&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/info&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/xbel&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="qt-解析">Qt 解析&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QFile&lt;/span> &lt;span class="nf">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QDir&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">homePath&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;/.local/share/recently-used.xbel&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QXmlStreamReader&lt;/span> &lt;span class="nf">reader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">atEnd&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">readNextStartElement&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">||&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">continue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QStringRef&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">location&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attributes&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QStringRef&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">added&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attributes&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;added&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">location&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isEmpty&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;文件链接: &amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">location&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;加入时间: &amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">added&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="相关提交">相关提交&lt;/h2>
+&lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dde/dde-file-manager/&amp;#43;/38956/" target="_blank" rel="noopener"
+>https://cr.deepin.io/#/c/dde/dde-file-manager/+/38956/&lt;/a>&lt;/p></description></item><item><title>QPlainTextEdit 文本光标绘制</title><link>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</link><pubDate>Thu, 11 Oct 2018 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</guid><description>&lt;p>发现在 Linux 下是没办法修改光标的颜色，在 Google、Qt 论坛搜索了一遍，还是解决不了。&lt;/p>
+&lt;p>今天看了一下 QPlainTextEdit 的 API 发现有 cursorRect() 这个函数，它返回光标所在的位置，突然灵感就来了，把 cursor 宽度设置为0，相当于把它给隐藏了，然后可以通过重写 paintEvent() 函数，在 viewport() 里绘制光标矩形，可以根据你想要的颜色来进行绘制。&lt;/p>
+&lt;h2 id="头文件">头文件&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#ifndef PLAINTEXTEDIT_H
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define PLAINTEXTEDIT_H
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QPlainTextEdit&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">QTimer&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">PlainTextEdit&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="n">QPlainTextEdit&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Q_OBJECT&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">public&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">PlainTextEdit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QWidget&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">parent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">nullptr&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">protected&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">void&lt;/span> &lt;span class="n">paintEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QPaintEvent&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">private&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QTimer&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">m_cursorTimer&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">m_cursorVisible&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#endif
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="源文件">源文件&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;plaintextedit.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QPainter&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QTimer&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">PlainTextEdit&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">PlainTextEdit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QWidget&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">parent&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">:&lt;/span> &lt;span class="n">QPlainTextEdit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">parent&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_cursorTimer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="n">QTimer&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_cursorVisible&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">false&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 隐藏光标
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">setCursorWidth&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QApplication&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">setCursorFlashTime&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 每 500 毫秒闪烁一次
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">m_cursorTimer&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">setInterval&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">500&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">connect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_cursorTimer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">QTimer&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">timeout&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="p">]&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_cursorVisible&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="o">!&lt;/span>&lt;span class="n">m_cursorVisible&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">viewport&lt;/span>&lt;span class="p">()&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">update&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">});&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 启动光标闪烁
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">m_cursorTimer&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">start&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="n">PlainTextEdit&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">paintEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QPaintEvent&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QPlainTextEdit&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">paintEvent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">e&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">m_cursorVisible&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QPainter&lt;/span> &lt;span class="nf">painter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">viewport&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QRect&lt;/span> &lt;span class="n">r&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">cursorRect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">r&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setWidth&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">painter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">fillRect&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">red&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="最后">最后&lt;/h2>
+&lt;p>经过 WPS 开发者 @cryfeifei 提醒，把啰嗦(LaJi)代码改进了一下。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">m_cursorVisible&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_cursorVisible&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_cursorVisible&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>改成&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">m_cursorVisible = !m_cursorVisible
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于闪烁还有一些交互，比如在文本改变的时候不进行闪烁、光标移动的时候也不进行闪烁&amp;hellip;&lt;/p></description></item></channel></rss>

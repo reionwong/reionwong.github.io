@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Linux on Reion's Blog</title><link>https://reionwong.github.io/categories/linux/</link><description>Recent content in Linux on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 18 Aug 2019 18:04:56 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/linux/index.xml" rel="self" type="application/rss+xml"/><item><title>kylin-assistant 项目源码阅读笔记</title><link>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sun, 18 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;p>根据官方介绍，麒麟助手是优客团队推出的一款开源的 Linux 系统管理软件，将 Linux 系统命令行方式的系统管理操作方式转化为更易用的可视化操作。麒麟助手集清理加速、健康优化、个性设置以及功能大全于一体，是用户便捷又贴心的系统助手。&lt;/p>
+&lt;p>闲来无事就看了看这个项目，源码地址：https://github.com/eightplus/kylin-assistant&lt;/p>
+&lt;p>这个项目主要使用 C++、Python 进行开发，前端图形库使用强大的 Qt，后端使用 Python，前端与后端的通信是借助于 D-Bus，本文主要对后端代码进行剖析，看看它是如何获取系统信息。&lt;/p>
+&lt;h2 id="项目目录">项目目录&lt;/h2>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>目录名&lt;/th>
+&lt;th>说明&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>backends&lt;/td>
+&lt;td>后端代码&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>cleaner&lt;/td>
+&lt;td>清理功能前端代码&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>component&lt;/td>
+&lt;td>一些控件代码&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>dbusproxy&lt;/td>
+&lt;td>dbus 通信相关&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>info&lt;/td>
+&lt;td>前端代码&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>plugins&lt;/td>
+&lt;td>工具箱&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>src&lt;/td>
+&lt;td>前端主代码&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;p>当然这些文件夹下包含各种子文件夹，以上内容仅概述，下面是各个后端模块的讲解。&lt;/p>
+&lt;h2 id="monitorball">MonitorBall&lt;/h2>
+&lt;p>这个模块包含了清理内存，获取 cpu 占用百分比，获取内存占用等信息；该模块引入了 psutil、subprocess 库，psutil 是一个跨平台库，能够轻松实现获取系统运行的进程和系统利用率（包括CPU、内存、磁盘、网络等）信息，它主要用来做系统监控，性能分析，进程管理。subprocess 允许你去创建一个新的进程让其执行另外的程序，并与它进行通信，获取标准的输入、标准输出、标准错误以及返回码等。&lt;/p>
+&lt;p>根据 cleanup_memory 函数名可知，它是一个可以清理内存功能，使用 subprocess 调用 shell 程序。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># clean up memory&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">cleanup_memory&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;&amp;#39;&amp;#39;force changed to disk, update the super block&amp;#39;&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pone&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Popen&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;sync&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">shell&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">pone&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;&amp;#39;&amp;#39;drop pagecache, dentries and inodes to free the memory&amp;#39;&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ptwo&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">subprocess&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Popen&lt;/span>&lt;span class="p">([&lt;/span>&lt;span class="s2">&amp;#34;echo 3 &amp;gt; /proc/sys/vm/drop_caches&amp;#34;&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="n">shell&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="kc">True&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ptwo&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">wait&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>首先它调用了 sync，这个命令来进行数据的写入动作，然后 pagecache、dentries、inodes 释放内存。&lt;/p>
+&lt;h3 id="获取内存信息">获取内存信息&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># get total memory&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_total_memory&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">symbol&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;m&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">baseData&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">psutil&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">virtual_memory&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">baseData&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">total&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="bp">self&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">bytes2human&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">symbol&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>首先它调用 psutil 里的函数，存入相关的变量，然后再进行数据转换(bytes to human)。&lt;/p>
+&lt;ul>
+&lt;li>得到 used：&lt;code>baseData.total - baseData.available&lt;/code>&lt;/li>
+&lt;li>得到 free: &lt;code>baseData.available&lt;/code>&lt;/li>
+&lt;li>得到百分比：&lt;code>baseData.percent&lt;/code>&lt;/li>
+&lt;/ul>
+&lt;h3 id="获取网络总流量">获取网络总流量&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># get network total flow, return (up, down)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_network_flow_total&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">symbol&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;k&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">network&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">psutil&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">network_io_counters&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sent&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">network&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">bytes_sent&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">recv&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">network&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">bytes_recv&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">symbol&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;b&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">sent&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">recv&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">symbol&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;k&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">k_up&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sent&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ups&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">k_up&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">ups&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">ups&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">ups&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">find&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">k_down&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">recv&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">downs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">k_down&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">downs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">downs&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">downs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">find&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">ups&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">downs&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="kc">None&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="数据转换函数">数据转换函数&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">bytes2human&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">value&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">symbol&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">symbol&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;k&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">value&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="n">symbol&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;m&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">value&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="n">symbol&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="s2">&amp;#34;g&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">valuef&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">float&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="mi">1024&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">values&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">valuef&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">value&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">values&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="n">values&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">find&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;.&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">pass&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">str&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>关于更多 psutil 用法请看：https://www.liaoxuefeng.com/wiki/1016959663602400/1183565811281984&lt;/p>
+&lt;h2 id="autostart-manage">Autostart Manage&lt;/h2>
+&lt;p>这个模块是管理 Linux 应用程序启动项的，它对相关目录进行读取，获取里面的 desktop 文件，根据 desktop 文件里的内容得知这个程序是否会在开机进行自启动。&lt;/p>
+&lt;p>以下是自启动文件夹：&lt;/p>
+&lt;ul>
+&lt;li>~/.config/autostart&lt;/li>
+&lt;li>/etc/xdg/autostart&lt;/li>
+&lt;/ul>
+&lt;h2 id="cleaner">Cleaner&lt;/h2>
+&lt;h3 id="cache-clean缓存清理">Cache Clean(缓存清理)&lt;/h3>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>类型&lt;/th>
+&lt;th>文件夹&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>apt 缓存&lt;/td>
+&lt;td>/var/cache/apt/archives&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>缩略图缓存&lt;/td>
+&lt;td>/.cache/thumbnails&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>firefox 缓存&lt;/td>
+&lt;td>~/.cache/mozilla/firefox/&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>Chromium 缓存&lt;/td>
+&lt;td>~/.cache/chromium/Default&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;h2 id="systeminfo">SystemInfo&lt;/h2>
+&lt;p>获取用户名等等信息通过 GLib 获取，以下是核心代码：&lt;/p>
+&lt;p>用户名：&lt;code>GLib.get_user_name()&lt;/code>
+Home 路径：&lt;code>GLib.get_home_dir()&lt;/code>
+当前Shell：&lt;code>GLib.getenv('SHELL')&lt;/code>&lt;/p>
+&lt;h3 id="获取发行版信息">获取发行版信息&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="line">&lt;span class="cl">&lt;span class="n">FILEPATH&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;/etc/lsb-release&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">RELEASEPATH&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;/etc/ubuntukylin-release&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">def&lt;/span> &lt;span class="nf">get_distro&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="bp">self&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="s1">&amp;#39;&amp;#39;&amp;#39;It should be: DISTRIB_DESCRIPTION=&amp;#34;UbuntuKylin 13.10&amp;#39;&amp;#39;&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">#FILEPATH RELEASEPATH&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">distro&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">RELEASEPATH&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">RELEASEPATH&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">fsys&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">fsys&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">startswith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;DISTRIB_DESCRIPTION&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">tmp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">line&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1"># kobe: remove &amp;#39;&amp;#34;&amp;#39; and &amp;#39;\n&amp;#39;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">front&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">tmp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">split&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span>&lt;span class="p">)[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#34;&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="c1">#(LP: #1240862)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">distro&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">front&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">platform&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">dist&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">elif&lt;/span> &lt;span class="n">os&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">path&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/etc/os-release&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">with&lt;/span> &lt;span class="nb">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;/etc/os-release&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;r&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">fsys&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="n">line&lt;/span> &lt;span class="ow">in&lt;/span> &lt;span class="n">fsys&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">startswith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;PRETTY_NAME&amp;#34;&lt;/span>&lt;span class="p">):&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">tmp&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">line&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">distro&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">tmp&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">split&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;=&amp;#39;&lt;/span>&lt;span class="p">)[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#34;&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="se">\n&lt;/span>&lt;span class="s1">&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s1">&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">a&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">platform&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">dist&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">b&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">platform&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">dist&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">c&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">platform&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">dist&lt;/span>&lt;span class="p">()[&lt;/span>&lt;span class="mi">2&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">distro&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s1">&amp;#39;-&amp;#39;&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">join&lt;/span>&lt;span class="p">((&lt;/span>&lt;span class="n">a&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">b&lt;/span>&lt;span class="p">,&lt;/span>&lt;span class="n">c&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">distro&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>首先检查 &lt;code>/etc/ubuntukylin-release&lt;/code> 是否存在，如果存在就对每一行进行解析，如遇到 &lt;code>DISTRIB_DESCRIPTION&lt;/code> 字段则截取无关字符串最后得到结果。&lt;/p>
+&lt;p>如果不存在上面的 &lt;code>ubuntukylin-release&lt;/code> 文件(这是 ubuntukylin 专有的 release 文件)，则判断 &lt;code>/etc/os-release&lt;/code> 文件，这是众多发行版的统一标准，然后逻辑与上面说明一致。&lt;/p></description></item><item><title>D-Bus 基础</title><link>https://reionwong.github.io/p/d-bus-%E5%9F%BA%E7%A1%80/</link><pubDate>Sat, 29 Sep 2018 15:52:40 +0800</pubDate><guid>https://reionwong.github.io/p/d-bus-%E5%9F%BA%E7%A1%80/</guid><description>&lt;p>D-Bus 是一种高级的进程间通信机制，是 freedesktop.org 的一个项目，为 Linux 桌面环境提供标准，是一个为应用程序间通信的消息总线系统, 主要用于在 Linux 进程之间的通信。&lt;/p>
+&lt;p>D-Bus 有三层架构的进程间的通信：&lt;/p>
+&lt;ul>
+&lt;li>接口层：由函数库 libdbus 提供，进程可通过该库使用 D-Bus&lt;/li>
+&lt;li>总线层：由 D-Bus 总线守护进程提供，它在 Linux 系统启动时运行，负责进程间的消息路由和传递，包括 Linux 内核和 Linux 桌面环境的消息传递。&lt;/li>
+&lt;li>包装层：基于特定应用程序框架的 Wrapper 库，比如 Gtk+、Qt 都有相应的包装层。&lt;/li>
+&lt;/ul>
+&lt;p>本文主要介绍 Qt DBus 的用法，Gtk+ 不会用。&lt;/p>
+&lt;h2 id="应用">应用&lt;/h2>
+&lt;p>目前 D-Bus 已被大多数 Linux 桌面环境所使用，开发者可使用 D-Bus 实现各种复杂的进程间的通信任务，就像 DDE (Deepin Desktop Environment) 的后端用 Golang 语言来写的，使用 D-Bus 可以实现后端进程与前端进程的通信，后端进程 daemon 提供各种 D-Bus 服务，前端可通过后端提供的接口来进行对接，获取数据。&lt;/p>
+&lt;p>查看 D-Bus 总线上的服务和对象可以通过 d-feet、qdbusviewer 等工具。
+发送信号可以使用 dbus-send，查看 D-Bus 消息流可以使用 dbus-monitor。&lt;/p>
+&lt;h2 id="在-qt-中使用-dbus">在 Qt 中使用 DBus&lt;/h2>
+&lt;p>QtDBus 模块 是 Qt 对 DBus 底层 API 封装的实现，如果你使用 qmake 构建 Qt 程序，可以将下面一行添加到 .pro 文件中，让你的项目链接到 Qt DBus 库：&lt;/p>
+&lt;p>&lt;code>QT += dbus&lt;/code>&lt;/p>
+&lt;p>cmake 可以这样（xxx是你的项目名称）&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">find_package(Qt5DBus REQUIRED)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">target_link_libraries(xxx Qt5DBus_LIBRARIES)
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="简单用法">简单用法&lt;/h3>
+&lt;p>不需要在 D-Bus 守护进程上注册服务和注册对象。&lt;/p>
+&lt;p>注册对象后，对象中导出的槽函数就可以供其他客户端来调用；注册了服务后对象就有了公共名，没有注册是只有三个唯一名。&lt;/p>
+&lt;p>在服务端只需要创建一个信号源后发送即可：&lt;/p>
+&lt;p>1). 创建 Qt DBus 信号&lt;/p>
+&lt;p>&lt;code>QDBusMessage msg = QDBusMessage::createSignal(&amp;quot;/rekols/path&amp;quot;, &amp;quot;rekols.interface&amp;quot;);&lt;/code>&lt;/p>
+&lt;p>2). 给信号赋值&lt;/p>
+&lt;p>&lt;code>msg &amp;lt;&amp;lt; QString(&amp;quot;Hello World&amp;quot;); &lt;/code>&lt;/p>
+&lt;p>3). 发射信号&lt;/p>
+&lt;p>&lt;code>QDBusConnection::sessionBus().send(msg);&lt;/code>&lt;/p>
+&lt;p>在客户端中：&lt;/p>
+&lt;p>1). 绑定信号&lt;/p>
+&lt;p>&lt;code>QDBusConnection::sessionBus().connect(&amp;quot;&amp;quot;, &amp;quot;&amp;quot;, &amp;quot;dbus.client.interface&amp;quot;, &amp;quot;Active&amp;quot;, this, SLOT(ActiveEvent(QString)));&lt;/code>&lt;/p>
+&lt;p>2). 在槽函数进行相关的处理&lt;/p>
+&lt;p>在 ActiveEvent 中执行你需要对这个信号做出的反应即可。&lt;/p>
+&lt;h3 id="实现单进程程序">实现单进程程序&lt;/h3>
+&lt;p>Qt 要实现单进程应用程序其实很简单，特别是用 DBus 来实现，首先连接到 DBus 总线守护程序，然后尝试注册一个服务，如果注册失败了，说明已经运行了一个进程则直接 return。&lt;/p>
+&lt;p>但是这样的做法只对 Linux 平台有效，要想跨平台还是通过 QLocalSocket/QLocalServer 监听服务连接吧 (Windows、Linux 都适用)。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;#34;mainwindow.h&amp;#34;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QApplication&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QDBusConnection&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QDBusInterface&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="nf">main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">argv&lt;/span>&lt;span class="p">[])&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QApplication&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">argc&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">argv&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 连接到 DBus 总线
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QDBusConnection&lt;/span> &lt;span class="n">dbus&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QDBusConnection&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">sessionBus&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 如果注册成功则创建窗口(必须以 xxx.xxx 来指定 service name)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">dbus&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">registerService&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;com.deepin.xxxxx&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">MainWindow&lt;/span> &lt;span class="n">w&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">w&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">show&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">a&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">exec&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 注册失败会退出程序
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="参考资料">参考资料&lt;/h2>
+&lt;p>官方介绍：https://www.freedesktop.org/wiki/Software/dbus/&lt;/p>
+&lt;p>Wikipedia： &lt;a class="link" href="https://zh.wikipedia.org/wiki/D-Bus" target="_blank" rel="noopener"
+>https://zh.wikipedia.org/wiki/D-Bus&lt;/a>&lt;/p>
+&lt;p>DBus系列之入门： &lt;a class="link" href="https://thebigdoc.readthedocs.io/en/latest/dbus/dbus.html" target="_blank" rel="noopener"
+>https://thebigdoc.readthedocs.io/en/latest/dbus/dbus.html&lt;/a>&lt;/p>
+&lt;p>D-Bus和 QT4：http://www.cnblogs.com/wwang/archive/2010/10/27/1862552.html&lt;/p>
+&lt;p>开发篇 —— DBus：https://blog.csdn.net/flowingflying/article/details/4527634&lt;/p>
+&lt;p>Gtk DBus基础：http://www.cnblogs.com/wzh206/archive/2010/05/13/1734901.html&lt;/p></description></item><item><title>管理 Linux 最近文件列表</title><link>https://reionwong.github.io/p/%E7%AE%A1%E7%90%86-linux-%E6%9C%80%E8%BF%91%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</link><pubDate>Sat, 29 Sep 2018 11:31:29 +0800</pubDate><guid>https://reionwong.github.io/p/%E7%AE%A1%E7%90%86-linux-%E6%9C%80%E8%BF%91%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</guid><description>&lt;p>freedesktop 定制了最近的文件存储规范 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
+>recent-file-spec&lt;/a>，为 X 桌面提供统一的标准，它存储在 &lt;code>~/.local/share/recently-used.xbel&lt;/code> 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 &lt;a class="link" href="https://savannah.nongnu.org/projects/fam/" target="_blank" rel="noopener"
+>FAM&lt;/a> 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。&lt;/p>
+&lt;h2 id="基本格式">基本格式&lt;/h2>
+&lt;p>xbel 文件基本格式如下：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;xbel&lt;/span> &lt;span class="na">version=&lt;/span>&lt;span class="s">&amp;#34;1.0&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">xmlns:bookmark=&lt;/span>&lt;span class="s">&amp;#34;http://www.freedesktop.org/standards/desktop-bookmarks&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="na">xmlns:mime=&lt;/span>&lt;span class="s">&amp;#34;http://www.freedesktop.org/standards/shared-mime-info&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark&lt;/span> &lt;span class="na">href=&lt;/span>&lt;span class="s">&amp;#34;file:///home/rekols/Desktop/test.txt&amp;#34;&lt;/span> &lt;span class="na">added=&lt;/span>&lt;span class="s">&amp;#34;2018-11-01T16:32:08Z&amp;#34;&lt;/span> &lt;span class="na">modified=&lt;/span>&lt;span class="s">&amp;#34;2018-11-01T16:32:46Z&amp;#34;&lt;/span> &lt;span class="na">visited=&lt;/span>&lt;span class="s">&amp;#34;2018-11-01T16:32:09Z&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;info&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;metadata&lt;/span> &lt;span class="na">owner=&lt;/span>&lt;span class="s">&amp;#34;http://freedesktop.org&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;mime:mime-type&lt;/span> &lt;span class="na">type=&lt;/span>&lt;span class="s">&amp;#34;text/plain&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:groups&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:group&amp;gt;&lt;/span>gedit&lt;span class="nt">&amp;lt;/bookmark:group&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark:groups&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:applications&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;bookmark:application&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;gedit&amp;#34;&lt;/span> &lt;span class="na">exec=&lt;/span>&lt;span class="s">&amp;#34;&amp;amp;apos;gedit %u&amp;amp;apos;&amp;#34;&lt;/span> &lt;span class="na">modified=&lt;/span>&lt;span class="s">&amp;#34;2018-11-01T16:32:46Z&amp;#34;&lt;/span> &lt;span class="na">count=&lt;/span>&lt;span class="s">&amp;#34;4&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark:applications&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/metadata&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/info&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nt">&amp;lt;/bookmark&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nt">&amp;lt;/xbel&amp;gt;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>根元素必须是 xbel，version 为 1.0，其他属性可以忽略；&lt;/p>
+&lt;p>每个书签都必须以 bookmark 元素为节点，书签的 URI 必须存储在 href 属性中；每个 bookmark元素 都应该有 added、modified、visited 属性，并且以 &lt;a class="link" href="http://www.w3.org/TR/NOTE-datetime" target="_blank" rel="noopener"
+>ISO 8601&lt;/a> 为规范的字符串，必须以 UTC 编码，所以读取的时候需要把 UTC 转换为本地时钟才是正确的。&lt;/p>
+&lt;p>每个 metadata 元素可以按照以下元素顺序任意组合：&lt;/p>
+&lt;ul>
+&lt;li>mime-type 是强制性的，必须包含 URI 指向目标的 MIME Type。&lt;/li>
+&lt;li>groups 元素包含一个 group 元素列表，每个元素包含一个组名，groups 元素不是必要的。&lt;/li>
+&lt;li>applications 元素包含一个 application 元素列表，指的是该 URI 用什么应用程序打开的。&lt;/li>
+&lt;/ul>
+&lt;p>每个 application 元素都有很多属性，name 属性是应用程序的名称，exec 属性是启动时的命令行，count 是打开的次数，modified 是最后一次打开的时间。&lt;/p>
+&lt;h2 id="xbel-读取">xbel 读取&lt;/h2>
+&lt;p>在通常情况下我们只关心 XML 元素的读取，所以 Qt 提供了一个快速解析类：QXmlStreamReader，可以从 QIODevice 或原始的 QByteArray 中读取数据，通过循环 readNextStartElement() 获取每一个 bookmark 元素的 href、added、modified 等属性的内容，还可以使用一组方便的函数 isStartElement()、text() 来获取&amp;hellip;&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QFile&lt;/span> &lt;span class="nf">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QDir&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">homePath&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;/.local/share/recently-used.xbel&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QXmlStreamReader&lt;/span> &lt;span class="nf">reader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">atEnd&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">readNextStartElement&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">||&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">continue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QStringRef&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">location&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attributes&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QStringRef&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">added&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">reader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attributes&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">value&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;added&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">location&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isEmpty&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;文件链接: &amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">location&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;加入时间: &amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">added&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>调用 reader 的 attributes() 获得所有属性，然后对返回的对象使用 value() 即可拿到属性的内容。&lt;/p>
+&lt;h2 id="添加文件">添加文件&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QString&lt;/span> &lt;span class="n">addedTime&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QDateTime&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">currentDateTime&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">toTimeSpec&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">OffsetFromUTC&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ISODate&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QFile&lt;/span> &lt;span class="nf">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QDir&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">homePath&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;/.local/share/recently-used.xbel&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QDomDocument&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setContent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Construct the new element
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">QDomElement&lt;/span> &lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">infoEl&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metadataEl&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mimeEl&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">fileUrl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;added&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">addedTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">addedTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;visited&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">addedTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">infoEl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;info&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">metadataEl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;metadata&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">metadataEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;owner&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;http://freedesktop.org&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mimeEl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;mime:mime-type&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">mimeEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mimetype&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">metadataEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mimeEl&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">infoEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">metadataEl&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">infoEl&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// Remove the existed element and insert the new element we&amp;#39;ve constructed
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">QDomElement&lt;/span> &lt;span class="n">root&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">documentElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">auto&lt;/span> &lt;span class="n">node_list&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">count&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="o">++&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">DUrl&lt;/span> &lt;span class="n">currentFileUrl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">DUrl&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">currentFileUrl&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">fileUrl&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">removeChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">shouldSendDeleteSignal&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QDomNode&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">bookmarkEl&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isNull&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">WriteOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QTextStream&lt;/span> &lt;span class="nf">out&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">out&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>&lt;a class="link" href="https://github.com/BLumia" target="_blank" rel="noopener"
+>@Blumia&lt;/a> 同学写的，相关提交：https://cr.deepin.io/#/c/dde/dde-file-manager/+/39540/&lt;/p>
+&lt;h2 id="移除文件">移除文件&lt;/h2>
+&lt;p>移除文件并不是把原始文件移动到回收站，而是从最近文件中移除，所以就需要在 xbel 文件上移除某个元素，然后保存文件。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QString&lt;/span> &lt;span class="n">need_remove_url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;xxxxxxxxxxxxxx&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QFile&lt;/span> &lt;span class="nf">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QDir&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">homePath&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s">&amp;#34;/.local/share/recently-used.xbel&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomDocument&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setContent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 根元素
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">root&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">documentElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 返回 root 所有 bookmark 元素列表
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QDomNodeList&lt;/span> &lt;span class="n">node_list&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 遍历所有 bookmark 元素，把需要的移除
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">count&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 获取 bookmark 中的 URI
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">file_url&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file_url&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">need_remove_url&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">root&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">removeChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">node_list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">m_recentNodes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">file_url&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">++&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 写入文件
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">WriteOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QTextStream&lt;/span> &lt;span class="nf">out&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="相关链接">相关链接&lt;/h2>
+&lt;p>&lt;a class="link" href="https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/" target="_blank" rel="noopener"
+>https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec&lt;/a>&lt;/p></description></item></channel></rss>

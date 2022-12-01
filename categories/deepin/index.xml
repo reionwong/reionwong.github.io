@@ -1,0 +1,1145 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>deepin on Reion's Blog</title><link>https://reionwong.github.io/categories/deepin/</link><description>Recent content in deepin on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 14 Nov 2018 22:50:55 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/deepin/index.xml" rel="self" type="application/rss+xml"/><item><title>DRecentManager 一些记录</title><link>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</link><pubDate>Wed, 14 Nov 2018 22:50:55 +0800</pubDate><guid>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</guid><description>&lt;p>之前写过一篇《管理 Linux 最近文件列表》的文章，专门对 Qt 操作 xml 的方法进行了阐述，现在的 DDE 文件管理器添加的方法是只要你双击打开文件，就会自动添加到 xbel 文件中，这一步是文件管理器做的，正确的做法应该是让应用自己来实现，为了让 deepin 全家桶应用加上，就需要在 dtkcore 中添加接口了，于是就诞生了 DRecentManager。&lt;/p>
+&lt;p>DRecentManager 是一个实现类似 GtkRecentManager 的一个类，主要用于管理最近使用的文件，删除和添加等等功能，方便 deepin 的应用把已打开的文件添加到 recent 列表中。&lt;/p>
+&lt;p>GtkRecentManager 用法很简单：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="n">GtkRecentManager&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">manager&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">gtk_recent_manager_get_default&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">gtk_recent_manager_add_item&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">manager&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">file_uri&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>先参考一下 file-roller 相关代码，看看是它的调用方法：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c" data-lang="c">&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="kt">void&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">fr_window_add_to_recent_list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FrWindow&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">GFile&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">_g_file_is_temp_dir&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">uri&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">g_file_get_uri&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">mime_type&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">GtkRecentData&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">recent_data&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">recent_data&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">g_new0&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">GtkRecentData&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">recent_data&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">mime_type&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">g_content_type_get_mime_type&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">archive&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">mime_type&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">recent_data&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">app_name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;File Roller&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">recent_data&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">app_exec&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;file-roller&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">gtk_recent_manager_add_full&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">gtk_recent_manager_get_default&lt;/span> &lt;span class="p">(),&lt;/span> &lt;span class="n">uri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">recent_data&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">g_free&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">recent_data&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">mime_type&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">g_free&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">recent_data&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">else&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">gtk_recent_manager_add_item&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">gtk_recent_manager_get_default&lt;/span> &lt;span class="p">(),&lt;/span> &lt;span class="n">uri&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">g_free&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">static&lt;/span> &lt;span class="kt">void&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nf">fr_window_remove_from_recent_list&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FrWindow&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">window&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">GFile&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">uri&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nf">g_file_get_uri&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">gtk_recent_manager_remove_item&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nf">gtk_recent_manager_get_default&lt;/span> &lt;span class="p">(),&lt;/span> &lt;span class="n">uri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">NULL&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="nf">g_free&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>可以看到 mime_type、app_name、app_exec 都是在自己的应用程序里定义的，然后传入 GtkRecentManager 中，它会对 xbel 文件进行增加更新处理。&lt;/p>
+&lt;h2 id="drecentmanager-代码实现">DRecentManager 代码实现&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt"> 10
+&lt;/span>&lt;span class="lnt"> 11
+&lt;/span>&lt;span class="lnt"> 12
+&lt;/span>&lt;span class="lnt"> 13
+&lt;/span>&lt;span class="lnt"> 14
+&lt;/span>&lt;span class="lnt"> 15
+&lt;/span>&lt;span class="lnt"> 16
+&lt;/span>&lt;span class="lnt"> 17
+&lt;/span>&lt;span class="lnt"> 18
+&lt;/span>&lt;span class="lnt"> 19
+&lt;/span>&lt;span class="lnt"> 20
+&lt;/span>&lt;span class="lnt"> 21
+&lt;/span>&lt;span class="lnt"> 22
+&lt;/span>&lt;span class="lnt"> 23
+&lt;/span>&lt;span class="lnt"> 24
+&lt;/span>&lt;span class="lnt"> 25
+&lt;/span>&lt;span class="lnt"> 26
+&lt;/span>&lt;span class="lnt"> 27
+&lt;/span>&lt;span class="lnt"> 28
+&lt;/span>&lt;span class="lnt"> 29
+&lt;/span>&lt;span class="lnt"> 30
+&lt;/span>&lt;span class="lnt"> 31
+&lt;/span>&lt;span class="lnt"> 32
+&lt;/span>&lt;span class="lnt"> 33
+&lt;/span>&lt;span class="lnt"> 34
+&lt;/span>&lt;span class="lnt"> 35
+&lt;/span>&lt;span class="lnt"> 36
+&lt;/span>&lt;span class="lnt"> 37
+&lt;/span>&lt;span class="lnt"> 38
+&lt;/span>&lt;span class="lnt"> 39
+&lt;/span>&lt;span class="lnt"> 40
+&lt;/span>&lt;span class="lnt"> 41
+&lt;/span>&lt;span class="lnt"> 42
+&lt;/span>&lt;span class="lnt"> 43
+&lt;/span>&lt;span class="lnt"> 44
+&lt;/span>&lt;span class="lnt"> 45
+&lt;/span>&lt;span class="lnt"> 46
+&lt;/span>&lt;span class="lnt"> 47
+&lt;/span>&lt;span class="lnt"> 48
+&lt;/span>&lt;span class="lnt"> 49
+&lt;/span>&lt;span class="lnt"> 50
+&lt;/span>&lt;span class="lnt"> 51
+&lt;/span>&lt;span class="lnt"> 52
+&lt;/span>&lt;span class="lnt"> 53
+&lt;/span>&lt;span class="lnt"> 54
+&lt;/span>&lt;span class="lnt"> 55
+&lt;/span>&lt;span class="lnt"> 56
+&lt;/span>&lt;span class="lnt"> 57
+&lt;/span>&lt;span class="lnt"> 58
+&lt;/span>&lt;span class="lnt"> 59
+&lt;/span>&lt;span class="lnt"> 60
+&lt;/span>&lt;span class="lnt"> 61
+&lt;/span>&lt;span class="lnt"> 62
+&lt;/span>&lt;span class="lnt"> 63
+&lt;/span>&lt;span class="lnt"> 64
+&lt;/span>&lt;span class="lnt"> 65
+&lt;/span>&lt;span class="lnt"> 66
+&lt;/span>&lt;span class="lnt"> 67
+&lt;/span>&lt;span class="lnt"> 68
+&lt;/span>&lt;span class="lnt"> 69
+&lt;/span>&lt;span class="lnt"> 70
+&lt;/span>&lt;span class="lnt"> 71
+&lt;/span>&lt;span class="lnt"> 72
+&lt;/span>&lt;span class="lnt"> 73
+&lt;/span>&lt;span class="lnt"> 74
+&lt;/span>&lt;span class="lnt"> 75
+&lt;/span>&lt;span class="lnt"> 76
+&lt;/span>&lt;span class="lnt"> 77
+&lt;/span>&lt;span class="lnt"> 78
+&lt;/span>&lt;span class="lnt"> 79
+&lt;/span>&lt;span class="lnt"> 80
+&lt;/span>&lt;span class="lnt"> 81
+&lt;/span>&lt;span class="lnt"> 82
+&lt;/span>&lt;span class="lnt"> 83
+&lt;/span>&lt;span class="lnt"> 84
+&lt;/span>&lt;span class="lnt"> 85
+&lt;/span>&lt;span class="lnt"> 86
+&lt;/span>&lt;span class="lnt"> 87
+&lt;/span>&lt;span class="lnt"> 88
+&lt;/span>&lt;span class="lnt"> 89
+&lt;/span>&lt;span class="lnt"> 90
+&lt;/span>&lt;span class="lnt"> 91
+&lt;/span>&lt;span class="lnt"> 92
+&lt;/span>&lt;span class="lnt"> 93
+&lt;/span>&lt;span class="lnt"> 94
+&lt;/span>&lt;span class="lnt"> 95
+&lt;/span>&lt;span class="lnt"> 96
+&lt;/span>&lt;span class="lnt"> 97
+&lt;/span>&lt;span class="lnt"> 98
+&lt;/span>&lt;span class="lnt"> 99
+&lt;/span>&lt;span class="lnt">100
+&lt;/span>&lt;span class="lnt">101
+&lt;/span>&lt;span class="lnt">102
+&lt;/span>&lt;span class="lnt">103
+&lt;/span>&lt;span class="lnt">104
+&lt;/span>&lt;span class="lnt">105
+&lt;/span>&lt;span class="lnt">106
+&lt;/span>&lt;span class="lnt">107
+&lt;/span>&lt;span class="lnt">108
+&lt;/span>&lt;span class="lnt">109
+&lt;/span>&lt;span class="lnt">110
+&lt;/span>&lt;span class="lnt">111
+&lt;/span>&lt;span class="lnt">112
+&lt;/span>&lt;span class="lnt">113
+&lt;/span>&lt;span class="lnt">114
+&lt;/span>&lt;span class="lnt">115
+&lt;/span>&lt;span class="lnt">116
+&lt;/span>&lt;span class="lnt">117
+&lt;/span>&lt;span class="lnt">118
+&lt;/span>&lt;span class="lnt">119
+&lt;/span>&lt;span class="lnt">120
+&lt;/span>&lt;span class="lnt">121
+&lt;/span>&lt;span class="lnt">122
+&lt;/span>&lt;span class="lnt">123
+&lt;/span>&lt;span class="lnt">124
+&lt;/span>&lt;span class="lnt">125
+&lt;/span>&lt;span class="lnt">126
+&lt;/span>&lt;span class="lnt">127
+&lt;/span>&lt;span class="lnt">128
+&lt;/span>&lt;span class="lnt">129
+&lt;/span>&lt;span class="lnt">130
+&lt;/span>&lt;span class="lnt">131
+&lt;/span>&lt;span class="lnt">132
+&lt;/span>&lt;span class="lnt">133
+&lt;/span>&lt;span class="lnt">134
+&lt;/span>&lt;span class="lnt">135
+&lt;/span>&lt;span class="lnt">136
+&lt;/span>&lt;span class="lnt">137
+&lt;/span>&lt;span class="lnt">138
+&lt;/span>&lt;span class="lnt">139
+&lt;/span>&lt;span class="lnt">140
+&lt;/span>&lt;span class="lnt">141
+&lt;/span>&lt;span class="lnt">142
+&lt;/span>&lt;span class="lnt">143
+&lt;/span>&lt;span class="lnt">144
+&lt;/span>&lt;span class="lnt">145
+&lt;/span>&lt;span class="lnt">146
+&lt;/span>&lt;span class="lnt">147
+&lt;/span>&lt;span class="lnt">148
+&lt;/span>&lt;span class="lnt">149
+&lt;/span>&lt;span class="lnt">150
+&lt;/span>&lt;span class="lnt">151
+&lt;/span>&lt;span class="lnt">152
+&lt;/span>&lt;span class="lnt">153
+&lt;/span>&lt;span class="lnt">154
+&lt;/span>&lt;span class="lnt">155
+&lt;/span>&lt;span class="lnt">156
+&lt;/span>&lt;span class="lnt">157
+&lt;/span>&lt;span class="lnt">158
+&lt;/span>&lt;span class="lnt">159
+&lt;/span>&lt;span class="lnt">160
+&lt;/span>&lt;span class="lnt">161
+&lt;/span>&lt;span class="lnt">162
+&lt;/span>&lt;span class="lnt">163
+&lt;/span>&lt;span class="lnt">164
+&lt;/span>&lt;span class="lnt">165
+&lt;/span>&lt;span class="lnt">166
+&lt;/span>&lt;span class="lnt">167
+&lt;/span>&lt;span class="lnt">168
+&lt;/span>&lt;span class="lnt">169
+&lt;/span>&lt;span class="lnt">170
+&lt;/span>&lt;span class="lnt">171
+&lt;/span>&lt;span class="lnt">172
+&lt;/span>&lt;span class="lnt">173
+&lt;/span>&lt;span class="lnt">174
+&lt;/span>&lt;span class="lnt">175
+&lt;/span>&lt;span class="lnt">176
+&lt;/span>&lt;span class="lnt">177
+&lt;/span>&lt;span class="lnt">178
+&lt;/span>&lt;span class="lnt">179
+&lt;/span>&lt;span class="lnt">180
+&lt;/span>&lt;span class="lnt">181
+&lt;/span>&lt;span class="lnt">182
+&lt;/span>&lt;span class="lnt">183
+&lt;/span>&lt;span class="lnt">184
+&lt;/span>&lt;span class="lnt">185
+&lt;/span>&lt;span class="lnt">186
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QMimeDatabase&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QDomDocument&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QTextStream&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QDateTime&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QFileInfo&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QFile&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QDir&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QUrl&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define RECENT_PATH QDir::homePath() + &amp;#34;/.local/share/recently-used.xbel&amp;#34;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">addItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DRecentData&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QFile&lt;/span> &lt;span class="n">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">RECENT_PATH&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">QFileInfo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">||&lt;/span> &lt;span class="n">uri&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isEmpty&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QString&lt;/span> &lt;span class="n">dateTime&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QDateTime&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">currentDateTime&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">toTimeSpec&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">OffsetFromUTC&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Qt&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ISODate&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomDocument&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setContent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// need to add file:// protocol.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QUrl&lt;/span> &lt;span class="n">url&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setScheme&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;file&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// get the MimeType name of the file.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">mimeType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isEmpty&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">mimeType&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QMimeDatabase&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">mimeTypeForFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">rootEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">documentElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomNodeList&lt;/span> &lt;span class="n">nodeList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">rootEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">isFound&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// find bookmark element exists.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">fileUrl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">fileUrl&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">isFound&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// update element content.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">isFound&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomNodeList&lt;/span> &lt;span class="n">appList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark:application&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">appEle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">bool&lt;/span> &lt;span class="n">appExists&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">appList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">appList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appName&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;exec&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appExec&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appExists&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">appExists&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;count&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toInt&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;visited&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;count&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">number&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">count&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomNode&lt;/span> &lt;span class="n">appsNode&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark:applications&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark:application&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;exec&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appExec&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;count&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;1&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appsNode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">appEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// add new elements if they don&amp;#39;t exist.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">infoEle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">metadataEle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">mimeEle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">appsEle&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">appChildEle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">url&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;added&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;visited&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">infoEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;info&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">infoEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">metadataEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;metadata&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">metadataEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;owner&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;http://freedesktop.org&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">infoEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">metadataEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mimeEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;mime:mime-type&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">mimeEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;type&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">mimeType&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">metadataEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">mimeEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appsEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark:applications&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appChildEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">createElement&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark:application&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appChildEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appChildEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;exec&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appExec&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appChildEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;modified&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dateTime&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appChildEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setAttribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;count&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;1&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">appsEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">appChildEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">metadataEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">appsEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomNode&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">rootEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appendChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">bookmarkEle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">isNull&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// write to file.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">WriteOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QTextStream&lt;/span> &lt;span class="n">out&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setCodec&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;UTF-8&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">flush&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">removeItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">target&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">removeItems&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QStringList&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">target&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">void&lt;/span> &lt;span class="nf">removeItems&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QStringList&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QFile&lt;/span> &lt;span class="n">file&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">RECENT_PATH&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomDocument&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setContent&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomElement&lt;/span> &lt;span class="n">rootEle&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">documentElement&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QDomNodeList&lt;/span> &lt;span class="n">nodeList&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">rootEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">elementsByTagName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;bookmark&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">count&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">fileUrl&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">toElement&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">attribute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;href&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">list&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">contains&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fileUrl&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">rootEle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">removeChild&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">nodeList&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">at&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="o">++&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">WriteOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QTextStream&lt;/span> &lt;span class="n">out&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">file&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setCodec&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;UTF-8&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">doc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">out&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">flush&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">file&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>差不多掌握了 Qt 对 XML 的骚操作了，哈哈哈。&lt;/p>
+&lt;h2 id="使用方法">使用方法&lt;/h2>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">DRecentData&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;Deepin Editor&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">appExec&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;deepin-editor&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">data&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">mimeType&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QMimeDatabase&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">mimeTypeForFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">DRecentManager&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">addItem&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">uri&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">data&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="提交">提交&lt;/h2>
+&lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dtkcore/&amp;#43;/39727/" target="_blank" rel="noopener"
+>https://cr.deepin.io/#/c/dtkcore/+/39727/&lt;/a>&lt;/p></description></item><item><title>DDE 通知服务技术细节原理</title><link>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</link><pubDate>Mon, 08 Oct 2018 23:19:46 +0800</pubDate><guid>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</guid><description>&lt;p>搬了一篇今年 4 月份写的文章，现在的 deepin-notifications 已经合并到 &lt;a class="link" href="https://github.com/linuxdeepin/dde-session-ui" target="_blank" rel="noopener"
+>dde-session-ui&lt;/a> 这个项目中了。&lt;/p>
+&lt;p>deepin-notifications 提供桌面通知服务，当有新的消息通知时就会在系统的右上角弹出消息通知对话框，按照 Deepin UI 设计规范做的，遵循了 freedesktop 标准来实现。&lt;/p>
+&lt;p>libnotify 是一个按照 &lt;a class="link" href="https://people.gnome.org/~mccann/docs/notification-spec/notification-spec-latest.html" target="_blank" rel="noopener"
+>Desktop Notifications Specification&lt;/a> (桌面通知规范) 实现的一个库，向通知守护进程发送桌面通知的函数库。这些通知可以用于通知用户一个事件或者显示某些形式的信息，而不用妨碍用户的操作，以异步的方式通知用户事件，并提供了一个 DBus 接口。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639.png"
+width="300"
+height="70"
+srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="428"
+data-flex-basis="1028px"
+>&lt;/p>
+&lt;h2 id="架构设计">架构设计&lt;/h2>
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications.png"
+width="890"
+height="533"
+srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="166"
+data-flex-basis="400px"
+>&lt;/p>
+&lt;h2 id="监听-dbus-接口">监听 DBus 接口&lt;/h2>
+&lt;p>可以通过下边命令：&lt;/p>
+&lt;p>&lt;code>dbus-monitor path=/org/freedesktop/Notifications; interface=org.freedesktop.Notifications&lt;/code>&lt;/p>
+&lt;p>当有消息弹出时输出：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">method call time=1522559004.396395 sender=:1.58 -&amp;gt; destination=org.freedesktop.Notifications serial=24 path=/org/freedesktop/Notifications; interface=org.freedesktop.Notifications; member=Notify
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">string &amp;#34;shadowsocks-qt5&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">uint32 0
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">string &amp;#34;shadowsocks-qt5&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">string &amp;#34;Shadowsocks-Qt5&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">string &amp;#34;bwh1 已断开&amp;#34;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">array [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">array [
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">int32 -1
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="核心技术">核心技术&lt;/h2>
+&lt;p>最主要的核心技术就是 Qt5 DBus 相关骚操作，DBus 主要用于各种复杂的进程间的通信任务，在 Qt 中的 DBus 是使用 DBus 的包装层 libdbus-qt，根据 xml文件 通过 qdbusxml2cpp 工具自动生成 DBus 类，然后connect…此处省略500行代码。&lt;/p>
+&lt;h2 id="配置">配置&lt;/h2>
+&lt;p>DBus 系统提供了一种机制，当访问某个 service 时，自动把该程序运行，这样可以保证在 deepin-notifications 被杀死的时候也可以达到自启的效果，这个需要在 &lt;code>/usr/share/dbus-1/services&lt;/code> 目录下建立一个 service 文件：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">[D-BUS Service]
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Name=org.freedesktop.Notifications
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Exec=/usr/lib/deepin-notifications/deepin-notifications
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="最后">最后&lt;/h2>
+&lt;p>其实这个也没啥好写的，主要就是连接相关 DBus 接口，当接受到新消息时就做出处理，好了编不下去…&lt;/p></description></item><item><title>Deepin Editor 1.0 开发总结</title><link>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</link><pubDate>Sat, 06 Oct 2018 02:21:03 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</guid><description>&lt;p>前段时间把编辑器这个项目给接了过来，锻炼一下自己、练练手，经历了各种修修补补、增增删删的环节，刚看了一下 github，发现到如今我提交的 commit 也有 200+ 了&amp;hellip;&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134.png"
+width="947"
+height="517"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="深度截图_选择区域_20181005232607.png"
+class="gallery-image"
+data-flex-grow="183"
+data-flex-basis="439px"
+>&lt;/p>
+&lt;h2 id="介绍">介绍&lt;/h2>
+&lt;p>Deepin 为什么喜欢造轮子？主要是为了达到深度操作系统 &lt;strong>用户界面 / 用户体验&lt;/strong> 大统一的目标，今年的最主要目标不是造轮子，而是往系统稳定性的方向发展，所以造轮子是副业；虽然目前深度编辑器在技术方面还秒杀不了 KDE 家的 kate 编辑器，这个后面会讲到，但是在 UI/UX 这方面我觉得可以秒杀它们。&lt;/p>
+&lt;p>深度编辑器定位就是简单易用、轻量级的编辑器，目标就是要替换 gedit，保持深度编辑器的 UI/UX 和深度家族整体设计语言保持一致，比如我最近一直在写博客，很多文章就是通过深度编辑器来写的；论坛里边很多用户说很少用到编辑器，也就偶尔修改配置文件和 TXT 文件的时候会用到，属于轻度使用；在编程写代码这方面环境来看，都有专属的 IDE (集成开发环境)，所以用记事本来写代码的很少吧。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1.png"
+width="1026"
+height="619"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="主界面"
+class="gallery-image"
+data-flex-grow="165"
+data-flex-basis="397px"
+>&lt;/p>
+&lt;p>顶部采用类似 Chrome 的标签栏设计，整体超窄边框显示，界面像深度终端那样简洁，不显示多余的东西，写作的沉浸感，带来了一种沉浸式的编辑体验。&lt;/p>
+&lt;p>多标签页设计支持将标签拖拽成窗口，或者将两个窗口拖拽到一个窗口里的另一个标签页。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu.png"
+width="189"
+height="436"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="右键智能菜单"
+class="gallery-image"
+data-flex-grow="43"
+data-flex-basis="104px"
+>&lt;/p>
+&lt;p>右键智能菜单足以替换传统编辑器的顶部菜单栏，右键菜单弹出时，如果文本已经有选择的区域，针对用户手动选择的文字进行：剪切、复制、粘贴、删除；如果没有选中状态，则临时高亮鼠标下的单词，针对光标下的单词进行：剪切、复制、粘贴、删除。&lt;/p>
+&lt;h3 id="其他小功能">其他小功能&lt;/h3>
+&lt;p>行号显示、查找关键字、替换关键字、只读模式下可以使用 Vim 快捷键进行字符移动操作，恩这些都是编辑器基本功能。&lt;/p>
+&lt;p>内置多套主题 UI，总有一款捕获你的心，实现一秒快速切换，适合善变的你。&lt;/p>
+&lt;p>在平时使用文件选择对话框来打开一些文件的时候，会出现一种重复选择目录的操作，这也是经常遇到的，因为每次打开都是选择 Home 目录里，这一个小细节我也是没办法忍的，所以实现了对上一次打开的目录进行保存，当你打开文件选择框的时候依旧是你上次打开文件夹目录。&lt;/p>
+&lt;p>支持默认快捷键定制。&lt;/p>
+&lt;p>在 Windows、MacOS、Linux 这三个不同的操作系统中，它们的换行符是不同的，Windows 是 &lt;code>\r\n&lt;/code>，Linux 是 &lt;code>\n&lt;/code>，MacOS是 &lt;code>\r&lt;/code>，据说 MacOS 10.0 以上的版本是以 &lt;code>\n&lt;/code> 为换行符，深度编辑器实现了在打开文件时候会自动侦测到文件的换行符，默认取第一行的换行符，当判断是某个操作系统时，在保存的时候会使用该换行符作为保存；保存对话框也提供了换行符的选项。&lt;/p>
+&lt;p>好了，非技术介绍就到这里了，下面才是主要内容。&lt;/p>
+&lt;h2 id="架构设计">架构设计&lt;/h2>
+&lt;h3 id="单进程多窗口设计理念">单进程多窗口设计理念&lt;/h3>
+&lt;p>深度编辑器是一个单进程多窗口的应用程序，单进程多窗口就是无论打开多少个窗口，它只有一个独立的进程，没有因为创建一个新窗口就会增加一个进程，实现多窗口单进程很简单，也有很多种方式，比如深度文件管理器通过 QLocalSocket/QLocalServer 来实现；在这里深度编辑器采用 DBus 来进行进程间的通信，通过 QDBusConnection 连接到 Session Bus，并提供一个服务，如果发现已经有程序注册了该服务，那么就说明已经启动了一个进程不需要再单独启动一个进程，然后通过 QDBusInterface 访问 Service 来达到进程通信的目的。&lt;/p>
+&lt;h3 id="窗口管理">窗口管理&lt;/h3>
+&lt;p>既然是单进程多窗口模式，就不能在 main.cpp 里管理窗口创建/销毁了，保持 main 文件的代码简介，所以就诞生了 StartManager 类，所有窗口创建都在这个类里边进行管理，同时把创建过的窗口指针保存在一个 QList 里。&lt;/p>
+&lt;h3 id="窗口布局">窗口布局&lt;/h3>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852.png"
+width="1240"
+height="659"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="前端布局"
+class="gallery-image"
+data-flex-grow="188"
+data-flex-basis="451px"
+>&lt;/p>
+&lt;p>用了差不多一年的 Qt GUI 库，对 Qt 布局也有大概的理解，其实 Qt 的布局理解起来还挺简单的，用起来确实比 Gtk+ 顺手多了；深度编辑器窗口布局大概就如上图所描述的，由于是多标签设计，Qt 提供了多页面切换布局：QStackedLayout，也有建立在 QStackedLayout 上的的便利类 QStackedWidget，主要是为了方便一些就用了 QStackedWidget，不用多 new 一个 QWidget，哈哈哈。&lt;/p>
+&lt;p>标签栏控件是用了 dtkwidget 里的 DTabBar，继承了 QTabBar，是 &lt;strong>@zccrs&lt;/strong> 大神写的一个增强 QTabBar 功能的控件，所以基本用起来和 QTabBar 没多大区别，在功能上当然要比 QTabBar 强大许多，主要是满足深度编辑器的多标签设计需求：&lt;/p>
+&lt;ul>
+&lt;li>支持左右拖动（这个原生的已经支持）&lt;/li>
+&lt;li>标签多的时候出现左右滚动箭头按钮&lt;/li>
+&lt;li>可以支持向外 Drag and Drop 事件，以产生标签拖拽出窗口的效果&lt;/li>
+&lt;li>新建标签栏按钮&lt;/li>
+&lt;/ul>
+&lt;p>EditWrapper 其实主要就是封装了左侧的行号控件 + Qt 编辑框控件 QPlainTextEdit，在 EditWrapper 类里做了 openFile()、saveFile() 相关操作，也就是在这个类做了打开文件、保存文件的代码，Window 类会调用到此相关的函数。&lt;/p>
+&lt;h3 id="主题模块">主题模块&lt;/h3>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e.png"
+width="233"
+height="256"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="Model View 概览"
+class="gallery-image"
+data-flex-grow="91"
+data-flex-basis="218px"
+>&lt;/p>
+&lt;p>把之前的 DSimpleListView 替换成了 QListView，使用 Qt 原生的 Model/View 架构，也就是模型、视图和委托，MV 架构可以将数据和界面代码分离，&lt;code>ThemeListModel&lt;/code> 作为数据层，&lt;code>ThemeItemDelegate&lt;/code> 是绘画代理层，&lt;code>ThemeListView&lt;/code> 负责视图显示。&lt;/p>
+&lt;p>在创建 &lt;code>ThmeListModel&lt;/code> 这个类的时候，它会自动加载所有主题资源文件，目录在 &lt;code>/usr/share/deepin-editor/themes&lt;/code> ，这个是写死了路径，通过 &lt;code>QFileInfoList&lt;/code> 对该目录进行遍历，加载里面所有主题文件进行数据存储，然后用背景颜色亮度进行排序。&lt;/p>
+&lt;p>主题文件以 &lt;code>.theme&lt;/code> 为后缀，是一个以 json 为格式的文件。&lt;/p>
+&lt;h2 id="编辑框控件">编辑框控件&lt;/h2>
+&lt;p>使用的是 Qt 官方清一色的编辑控件 QPlainTextEdit，主要用于纯文本编辑和显示，因为天生缺陷，比如加载大文件的时候比较慢了，delete 后内存没有被释放等等，我也开始有点嫌弃它了，KDE 自己写了一套组件，完全是根据自己的标准来写的，界面显示内容全都是在一个 QAbstractScrollArea 里绘制，名叫 &lt;a class="link" href="https://api.kde.org/frameworks/ktexteditor/html/" target="_blank" rel="noopener"
+>KTextEditor&lt;/a>，其工程之大，真所谓鬼斧神工，是一个比 QPlainTextEdit 控件要厉害多了，大文件加载完全秒完成，而且高亮也不会卡 UI 线程。&lt;/p>
+&lt;p>研究了几天时间，也想过要造这个轮子，但是目前还写不出和 QPlainTextEdit 那种高度的水平，更不能说要秒杀 &lt;a class="link" href="https://api.kde.org/frameworks/ktexteditor/html/" target="_blank" rel="noopener"
+>KTextEditor&lt;/a> 了，那就先放一下了，这个时候想起了老王说的那句话：“很多时候技术上遇到瓶颈，千万不要放弃，先暂时放一下，灵感会随着你长时间的深入思考突然蹦出来的。”&lt;/p>
+&lt;p>至于为什么不用 &lt;a class="link" href="https://api.kde.org/frameworks/ktexteditor/html/" target="_blank" rel="noopener"
+>KTextEditor&lt;/a> ，这些依赖都不是盖的，哈哈哈。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a.png"
+width="1240"
+height="563"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="KTextEditor 依赖网"
+class="gallery-image"
+data-flex-grow="220"
+data-flex-basis="528px"
+>&lt;/p>
+&lt;h2 id="高亮实现">高亮实现&lt;/h2>
+&lt;p>关于 Qt 语法高亮，Qt 官方文档有个很好的例子：&lt;a class="link" href="http://doc.qt.io/qt-5/qtwidgets-richtext-syntaxhighlighter-example.html" target="_blank" rel="noopener"
+>Syntax Highlighter Example&lt;/a>，QSyntaxHighlighter 允许自定义高亮规则，但是需要配合 QPlainTextEdit 来使用，如果未来自己实现一个编辑器控件的话，这个也是个问题。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955.png"
+width="213"
+height="132"
+srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="KSyntaxHighlighting 依赖网"
+class="gallery-image"
+data-flex-grow="161"
+data-flex-basis="387px"
+>&lt;/p>
+&lt;p>使用了 KDE 的 &lt;a class="link" href="https://github.com/KDE/syntax-highlighting" target="_blank" rel="noopener"
+>KSyntaxHighlighting&lt;/a>，它是一个 Qt 的高亮引擎库，在 QSyntaxHighlighter 类基础上进行开发的，Qt Creator 也在用这个库，目前支持 272 种语法高亮，也可以自己定制扩展：&lt;a class="link" href="https://docs.kde.org/stable5/en/applications/katepart/highlight.html" target="_blank" rel="noopener"
+>Working with Syntax Highlighting&lt;/a>，这个项目几乎是 KDE 依赖最小的吧，看了一下确实只依赖了 Extra CMake Modules (ecm) &amp;hellip;&lt;/p>
+&lt;h2 id="polkit-提权实现">Polkit 提权实现&lt;/h2>
+&lt;p>待写。&lt;/p>
+&lt;h2 id="最后">最后&lt;/h2>
+&lt;p>之前一位社区开发者 @sonichy 问我：右键打开文件的时候是怎么实现在标签页中打开呢？我大概知道是什么意思了，最近没有时间回复，在这里可以回答一下。双击打开文件的时候文件管理器会调用对应的软件，并且会加上当前打开的文件地址字符串作为参数传进来编辑器，然后使用 QDBusInterface 作为远程对象接口代理，通过 callWithArgumentList() 调用远程接口，这样就实现了不打开新窗口。&lt;/p></description></item><item><title>深度文件管理器文件拷贝原理</title><link>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</guid><description>&lt;p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。&lt;/p>
+&lt;p>大概是这么一个流程：&lt;/p>
+&lt;ul>
+&lt;li>传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir)&lt;/li>
+&lt;li>求出目标文件完整地址：目标目录 + 源文件名，targetPath = tarDir + fromPath.fileName()&lt;/li>
+&lt;li>定义了写入数据块大小：DATA_BLOCK_SIZE 为 65536&lt;/li>
+&lt;li>创建两个 QFile 对象（源文件地址与目标文件地址）&lt;/li>
+&lt;li>调用 QFile::open() 方法，源文件打开模式为只读（ReadOnly），目标文件打开模式为只写（WriteOnly）&lt;/li>
+&lt;li>调用 QIODevice::read() 方法，每次读取一块字节数据，会返回读取的字节数（如果为0则代表拷贝成功，-1 说明失败）&lt;/li>
+&lt;li>调用 QIODevice::write() 循环写入一个数据块，也会返回写入的字节数，如果为0就会停止循环，说明文件拷贝成功&lt;/li>
+&lt;/ul>
+&lt;p>使用 Qt 读写类 QFile 来进行文件读写操作，都会调用到系统 open、read、write&amp;hellip;&lt;/p>
+&lt;p>计算拷贝文件百分比进度也很简单，在写入过程中把已写入字节数存储，已写入字节数 / 总字节数 * 100.0 就是当前拷贝文件的进度，计算的公式也就是：&lt;/p>
+&lt;p>&lt;code>percent = bytesCopied / TotalByte * 100.0&lt;/code>&lt;/p>
+&lt;h2 id="拷贝文件简单实现">拷贝文件简单实现&lt;/h2>
+&lt;p>根据 dde-file-manager 代码逻辑写一个简单的。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;span class="lnt">59
+&lt;/span>&lt;span class="lnt">60
+&lt;/span>&lt;span class="lnt">61
+&lt;/span>&lt;span class="lnt">62
+&lt;/span>&lt;span class="lnt">63
+&lt;/span>&lt;span class="lnt">64
+&lt;/span>&lt;span class="lnt">65
+&lt;/span>&lt;span class="lnt">66
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QFile&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#include&lt;/span> &lt;span class="cpf">&amp;lt;QFileInfo&amp;gt;&lt;/span>&lt;span class="cp">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#define DATA_BLOCK_SIZE 1000
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">bool&lt;/span> &lt;span class="nf">copyFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">fromPath&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">targetDir&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QFileInfo&lt;/span> &lt;span class="n">fromFileInfo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fromPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QString&lt;/span> &lt;span class="n">targetPath&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%1/%2&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">arg&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">targetDir&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">arg&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fromFileInfo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">fileName&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QFile&lt;/span> &lt;span class="n">fromFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fromPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QFile&lt;/span> &lt;span class="n">targetFile&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">targetPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">char&lt;/span> &lt;span class="n">dataBuffer&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">DATA_BLOCK_SIZE&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">quint64&lt;/span> &lt;span class="n">bytesCopied&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">quint64&lt;/span> &lt;span class="n">totalByte&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 如果源文件不可读直接返回 false
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">ReadOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 如果目标文件不可写直接返回 false
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="n">targetFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">open&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QIODevice&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">WriteOnly&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">true&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 读取一段数据块
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">qint64&lt;/span> &lt;span class="n">inBytes&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DATA_BLOCK_SIZE&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">inBytes&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">targetFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 写入完成后设置目标文件的权限
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="c1">// 保持目标文件与源文件权限是一致的
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">targetFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">setPermissions&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">permissions&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">inBytes&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">fromFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">targetFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">qint64&lt;/span> &lt;span class="n">availableBytes&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">inBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nb">true&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 写入一段数据块
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">qint64&lt;/span> &lt;span class="n">writtenBytes&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">targetFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">dataBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">availableBytes&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">availableBytes&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">availableBytes&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">writtenBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 一段数据块写入完成后终止循环
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">writtenBytes&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span> &lt;span class="n">availableBytes&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">){&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 输出百分比进度
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">bytesCopied&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">inBytes&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">bytesCopied&lt;/span> &lt;span class="o">/&lt;/span> &lt;span class="n">totalByte&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">100.0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="nb">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="拷贝文件夹">拷贝文件夹&lt;/h2>
+&lt;p>拷贝文件夹通过遍历文件夹每个文件然后调用 copyFile() 进行拷贝操作。&lt;/p>
+&lt;p>遍历目录拷贝文件之前根据 inode 对所有文件进行一次排序，然后再进行拷贝操作。&lt;/p>
+&lt;h2 id="linux-零拷贝技术">Linux 零拷贝技术&lt;/h2>
+&lt;p>Linux 中提供类似的系统调用主要有 sendfile()、mmap() 和splice()&lt;/p>
+&lt;p>参考：&lt;a class="link" href="http://abcdxyzk.github.io/blog/2015/05/07/kernel-mm-splice/" target="_blank" rel="noopener"
+>Linux 中的零拷贝技术 splice&lt;/a>&lt;/p>
+&lt;h2 id="最后">最后&lt;/h2>
+&lt;p>具体代码实现请看：&lt;a class="link" href="https://github.com/linuxdeepin/dde-file-manager/blob/e8bd4a23647eee871ad1caf8c10c465be2dbd6e7/fileoperations/filejob.cpp#L833" target="_blank" rel="noopener"
+>filejob.cpp&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
+&lt;h2 id="架构设计">架构设计&lt;/h2>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech.png"
+width="646"
+height="503"
+srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="架构设计图.png"
+class="gallery-image"
+data-flex-grow="128"
+data-flex-basis="308px"
+>&lt;/p>
+&lt;p>主要由以下三部分构成：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>deepin-font-installer 为字体安装器主进程，一共有三个页面（首页、字体信息页面、字体列表页面）构成。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>libdeepin-font-installer 为核心库，提供获取字体信息、安装、卸载、重装、预览控件接口。&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>dde-font-preview-plugin 为深度文件管理器字体预览接口。&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>深度字体安装器核心技术有：&lt;/p>
+&lt;ul>
+&lt;li>字体信息获取&lt;/li>
+&lt;li>预览控件实现&lt;/li>
+&lt;/ul>
+&lt;h2 id="前端界面实现">前端界面实现&lt;/h2>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202.png"
+width="520"
+height="440"
+srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="deepin_20180310184202.png"
+class="gallery-image"
+data-flex-grow="118"
+data-flex-basis="283px"
+>&lt;/p>
+&lt;p>基于DTK开发，确保基本风格和 Deepin 全家桶应用保持一致；主界面 DMainWindow 为基础，布局使用 QStackedLayout 实现多页面切换。&lt;/p>
+&lt;h3 id="拖放功能">拖放功能&lt;/h3>
+&lt;p>拖放由两部分组成：拖动和释放，拖动是将被拖放对象进行移动，释放是将被拖放对象放下，其实就是鼠标左键移动和松开鼠标左键过程。&lt;/p>
+&lt;p>所以就需要重写 dragEnterEvent() 和 dropEvent() 两个函数，前者为拖放进入事件，后者为释放事件，然后得到所有路径后进行处理，达到拖拽字体文件或文件夹效果，还需开启拖放功能： &lt;code>setAcceptDrops(true);&lt;/code>&lt;/p>
+&lt;h3 id="字体安装首页">字体安装首页：&lt;/h3>
+&lt;p>展示图标（使用 QSvgWidget 可以保证在高分屏下渲染清晰）、提示文本（提示用户可以拖拽字体文件到此窗口）、选择文件按钮（DLinkButton），一共有三个控件，当&amp;quot;选择文件&amp;quot;按钮被按下后弹出选择文件对话框（QFileDialog）。&lt;/p>
+&lt;h3 id="文件选择对话框">文件选择对话框：&lt;/h3>
+&lt;p>调用QFileDialog，支持多个文件选择，过滤非字体文件类型，并且保存上一次打开目录（通过保存配置文件）。&lt;/p>
+&lt;h3 id="字体信息页面">字体信息页面：&lt;/h3>
+&lt;p>当只有打开或拖拽一个文件才会显示此页面，主要展示字体名称、风格、类型、版本、版权、描述信息，通过调用 libdeepin-font-installer 获取，当获取到的某个信息为空的时候显示 &amp;ldquo;Unknown&amp;rdquo;，因为某些字体文件里没有版权或描述信息。&lt;/p>
+&lt;h3 id="字体批量安装页面">字体批量安装页面：&lt;/h3>
+&lt;p>打开两个或者两个以上显示此页面，列表控件使用 DSimpleListView，item 遇到 hover 状态的时候显示关闭按钮（从列表中移除），只剩一个文件的时候自动到跳转字体信息页面。&lt;/p>
+&lt;h2 id="核心接口实现libdeepin-font-installer">核心接口实现（libdeepin-font-installer）&lt;/h2>
+&lt;p>就先说说 freetype 吧，因为使用到了它；根据官方得知，它是一款字体渲染引擎，使用C语言编写，旨在实现小巧，高效，高度可定制和便携，同时能够生成大多数矢量和位图字体格式的高质量输出（字形图像），知名的 GNU/Linux、iOS、Android 都使用了它，可以说运行 freetype 的设备超过10亿，哈哈哈。&lt;/p>
+&lt;h3 id="获取字体信息">获取字体信息&lt;/h3>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;span class="lnt">46
+&lt;/span>&lt;span class="lnt">47
+&lt;/span>&lt;span class="lnt">48
+&lt;/span>&lt;span class="lnt">49
+&lt;/span>&lt;span class="lnt">50
+&lt;/span>&lt;span class="lnt">51
+&lt;/span>&lt;span class="lnt">52
+&lt;/span>&lt;span class="lnt">53
+&lt;/span>&lt;span class="lnt">54
+&lt;/span>&lt;span class="lnt">55
+&lt;/span>&lt;span class="lnt">56
+&lt;/span>&lt;span class="lnt">57
+&lt;/span>&lt;span class="lnt">58
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 字体路径
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">filePath&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s">&amp;#34;xxx/xxx/xx.ttf&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FT_Library&lt;/span> &lt;span class="n">m_library&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FT_Face&lt;/span> &lt;span class="n">m_face&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">//初始化freetype
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">FT_Init_FreeType&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">m_library&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FT_Error&lt;/span> &lt;span class="n">error&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FT_New_Face&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_library&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">filePath&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">toUtf8&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">constData&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 字体文件错误，无法打开
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">error&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 得到字体名称
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">familyName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">fromLatin1&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">family_name&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 得到字体样式
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">styleName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">fromLatin1&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">style_name&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FT_SfntName&lt;/span> &lt;span class="n">sname&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">int&lt;/span> &lt;span class="n">count&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">FT_Get_Sfnt_Name_Count&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">);&lt;/span> &lt;span class="n">i&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">count&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">i&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 跳过无效信息
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FT_Get_Sfnt_Name&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">i&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">sname&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">!=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">continue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// only handle the unicode names for US langid.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="o">!&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">platform_id&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">TT_PLATFORM_MICROSOFT&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">encoding_id&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">TT_MS_ID_UNICODE_CS&lt;/span> &lt;span class="o">&amp;amp;&amp;amp;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">language_id&lt;/span> &lt;span class="o">==&lt;/span> &lt;span class="n">TT_MS_LANGID_ENGLISH_UNITED_STATES&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">continue&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 由于返回的是UTF16BE编码，需要转换UTF8，具体实现查看项目源代码
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">switch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">name_id&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="nl">TT_NAME_ID_COPYRIGHT&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 得到版权字符串（需转换）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="nl">TT_NAME_ID_VERSION_STRING&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 得到版本号字符串（需转换）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">case&lt;/span> &lt;span class="nl">TT_NAME_ID_DESCRIPTION&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 得到描述信息字符串（需转换）
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">qDebug&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">char&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">sname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">string&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 释放内存
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="n">FT_Done_Face&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_face&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">FT_Done_FreeType&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">m_library&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="获取所有字体路径">获取所有字体路径&lt;/h3>
+&lt;p>这个有几种方案：&lt;/p>
+&lt;ul>
+&lt;li>
+&lt;p>遍历 /usr/share/fonts 与 ~/.local/share/fonts 所有文件，判断是否为字体mime类型&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>使用fontconfig获取，能够得到系统目录和用户目录&lt;/p>
+&lt;/li>
+&lt;li>
+&lt;p>执行 &lt;code>fc-list : file&lt;/code> 得到输出后处理数据&lt;/p>
+&lt;/li>
+&lt;/ul>
+&lt;p>这三种方法都用过了，最后还是选择第三种，具体实现：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QStringList&lt;/span> &lt;span class="nf">getAllFontPath&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QStringList&lt;/span> &lt;span class="n">pathList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QProcess&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">process&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">QProcess&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">process&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">start&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;fc-list&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">QStringList&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;:&amp;#34;&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="s">&amp;#34;file&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 等待完成
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">waitForFinished&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 读取所有输出内容
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="n">output&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">readAllStandardOutput&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 分行
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">QStringList&lt;/span> &lt;span class="n">lines&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">output&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">split&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QChar&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sc">&amp;#39;\n&amp;#39;&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 释放QProcess内存
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">process&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">deleteLater&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 遍历分行内容
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">QString&lt;/span> &lt;span class="nl">line&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="n">lines&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// 把末尾:字体去除，添加到list
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="n">pathList&lt;/span> &lt;span class="o">&amp;lt;&amp;lt;&lt;/span> &lt;span class="n">line&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">remove&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QChar&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="sc">&amp;#39;:&amp;#39;&lt;/span>&lt;span class="p">)).&lt;/span>&lt;span class="n">simplified&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">return&lt;/span> &lt;span class="n">pathList&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="安装卸载重装实现">安装、卸载、重装实现&lt;/h3>
+&lt;p>安装卸载就是文件复制删除操作，然后刷新字体缓存，写成独立程序（dfont-install、dfont-uninstall），可以保证弹出 pkexec 授权对话框的提示内容不同，拷贝删除操作使用QT封装好的类 QFile::copy 与 QFile::remove ，重装通过执行 cp -f 覆盖文件。&lt;/p>
+&lt;p>&lt;strong>安装目录：&lt;/strong> 统一安装在 &lt;code>/usr/share/fonts/deepin-font-install&lt;/code> 下（deepin-font-installer 安装时创建此目录），不用能把所有字体都拷贝到同一个目录里，fc-cache 会遍历整个目录进行刷新，当一个目录有100个字体，fc-cache 就会从第一个到最后一个进行刷新缓存，导致速度很慢，所以就需要子目录来解决此问题。&lt;/p>
+&lt;p>&lt;strong>批量安装进度获取：&lt;/strong> 总文件数量 ÷ 当前正在安装的序号，使用 JSON 输出与 GUI 程序进行通信，所有字体文件安装完成后刷新字体缓存。&lt;/p>
+&lt;h3 id="提权处理">提权处理&lt;/h3>
+&lt;p>由于安装在系统目录，操作都需要 root 权限，使用 pkexec 来运行二进制进行提权处理，提供对应的配置文件来进行提权对话框的内容显示。&lt;/p>
+&lt;p>配置文件目录：/usr/share/polkit-1/actions/&lt;/p>
+&lt;p>参考：&lt;a class="link" href="https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html" target="_blank" rel="noopener"
+>freedesktop官方文档&lt;/a>&lt;/p>
+&lt;h3 id="字体预览控件">字体预览控件&lt;/h3>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47.png"
+width="1280"
+height="762"
+srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="预览效果图.png"
+class="gallery-image"
+data-flex-grow="167"
+data-flex-basis="403px"
+>&lt;/p>
+&lt;p>控件基于 QWidget，传入一个字体文件路径，然后载入该字体（使用 QFontDatabase 类），重载 paintEvent 事件绘画预览内容，整个窗口大小为屏幕大小 ÷ 1.5。&lt;/p>
+&lt;h4 id="获取预览内容">获取预览内容&lt;/h4>
+&lt;p>加载所有语言的示例文本内容，检查打开的字体是否支持当前系统语言的预览内容显示（使用 freetype 库），如果不支持就判断英文的预览内容，还是不支持的话自动生成一串 unicode 进行预览（例如图标字体，由 freetype 生成）；字号由小到大，一到三行为固定字符串；三行以下为预览内容。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE.png"
+width="573"
+height="710"
+srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+alt="获取预览内容流程图.png"
+class="gallery-image"
+data-flex-grow="80"
+data-flex-basis="193px"
+>&lt;/p>
+&lt;h4 id="获取预览样式">获取预览样式&lt;/h4>
+&lt;p>通过 freetype 获取打开字体的样式字符串，所有样式：Italic、Regular、Bold、Light、Thin、ExtraLight、ExtraBold、Medium、DemiBold、Black，然后判断字符串（QString类的contains方法），然后设置为相应的样式。&lt;/p>
+&lt;h3 id="文件管理器预览插件dde-font-preview-plugin">文件管理器预览插件（dde-font-preview-plugin）&lt;/h3>
+&lt;p>基于文件管理器文件预览插件接口 DFMFilePreview 和 libdeepin-font-installer 提供的字体预览接口，在文件管理器的文件预览中实现对字体文件的空格预览&lt;/p>
+&lt;h3 id="最后">最后&lt;/h3>
+&lt;p>项目地址：https://github.com/linuxdeepin/deepin-font-installer&lt;/p></description></item></channel></rss>
