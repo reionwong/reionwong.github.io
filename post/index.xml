@@ -1,4 +1,95 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Reion's Blog</title><link>https://reionwong.github.io/post/</link><description>Recent content in Posts on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 02 Oct 2021 12:20:06 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Wine HiDPI 补丁</title><link>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Reion's Blog</title><link>https://reionwong.github.io/post/</link><description>Recent content in Posts on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Apr 2022 14:28:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Qt QIconLoader</title><link>https://reionwong.github.io/p/qt-qiconloader/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qt-qiconloader/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
+&lt;p>QIconLoader 被设计成单实例，以便让其他模块方便使用，初始化时候首先会获取系统主题名称，如果提供主题为空则继续获取 systemFallbackThemeName()，并且会从 IconEngineFactoryLoader 的插件中查看是否支持 svg 格式。&lt;/p>
+&lt;p>在 Linux 中使用 Qt 开发 DE 的都会实现一个 Qt PlatformTheme 的插件，通过这个插件可以达到主题动态修改，在 QPlatformTheme 中重载实现，返回 themeHint() 中的 QPlatformTheme::SystemIconThemeName。&lt;/p>
+&lt;p>QIconLoader 包含以下模块：&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558.png"
+width="1166"
+height="513"
+srcset="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="227"
+data-flex-basis="545px"
+>&lt;/p>
+&lt;h1 id="查找图标主题位置">查找图标主题位置&lt;/h1>
+&lt;p>通过访问 &lt;code>QPlatformTheme::themeHint(QPlatformTheme::IconThemeSearchPaths)&lt;/code> 获取一个字符串 List。&lt;/p>
+&lt;h1 id="数据结构">数据结构&lt;/h1>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="k">struct&lt;/span> &lt;span class="nc">QIconDirInfo&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">enum&lt;/span> &lt;span class="nc">Type&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="n">Fixed&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Scalable&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Threshold&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Fallback&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QIconDirInfo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QString&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">_path&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">path&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">_path&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">size&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">maxSize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">minSize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">threshold&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">0&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">scale&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">1&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">type&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Threshold&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QString&lt;/span> &lt;span class="n">path&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">short&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">short&lt;/span> &lt;span class="n">maxSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">short&lt;/span> &lt;span class="n">minSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">short&lt;/span> &lt;span class="n">threshold&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="kt">short&lt;/span> &lt;span class="n">scale&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">Type&lt;/span> &lt;span class="n">type&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">class&lt;/span> &lt;span class="nc">QIconLoaderEngineEntry&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="k">public&lt;/span>&lt;span class="o">:&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">virtual&lt;/span> &lt;span class="o">~&lt;/span>&lt;span class="n">QIconLoaderEngineEntry&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">{}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">virtual&lt;/span> &lt;span class="n">QPixmap&lt;/span> &lt;span class="nf">pixmap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">const&lt;/span> &lt;span class="n">QSize&lt;/span> &lt;span class="o">&amp;amp;&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QIcon&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">Mode&lt;/span> &lt;span class="n">mode&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QIcon&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">State&lt;/span> &lt;span class="n">state&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QString&lt;/span> &lt;span class="n">filename&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QIconDirInfo&lt;/span> &lt;span class="n">dir&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">};&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h1 id="qiconcachegtkreader">QIconCacheGtkReader&lt;/h1>
+&lt;p>Gtk 图标缓冲，用于方便查找图标。&lt;/p>
+&lt;h1 id="qicontheme">QIconTheme&lt;/h1>
+&lt;p>遍历主题路径下的文件夹，匹配到相应的主题&lt;/p>
+&lt;p>寻找图标的逻辑是遍历所有子文件夹寻找图标，通过图标名称和后缀 (.png 和 .svg) 判断文件是否存在，如果存在表示已经寻找到。&lt;/p>
+&lt;h1 id="位置">位置&lt;/h1>
+&lt;ul>
+&lt;li>src/gui/image/qiconloader_p.h&lt;/li>
+&lt;li>src/gui/image/qiconloader.cpp&lt;/li>
+&lt;/ul></description></item><item><title>Wine HiDPI 补丁</title><link>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
