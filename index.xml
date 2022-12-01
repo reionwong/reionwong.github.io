@@ -1,4 +1,167 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Reion's Blog</title><link>https://reionwong.github.io/</link><description>Recent content on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://reionwong.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Archives</title><link>https://reionwong.github.io/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://reionwong.github.io/archives/</guid><description/></item><item><title>kylin-assistant 项目源码阅读笔记</title><link>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sun, 18 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;p>根据官方介绍，麒麟助手是优客团队推出的一款开源的 Linux 系统管理软件，将 Linux 系统命令行方式的系统管理操作方式转化为更易用的可视化操作。麒麟助手集清理加速、健康优化、个性设置以及功能大全于一体，是用户便捷又贴心的系统助手。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Reion's Blog</title><link>https://reionwong.github.io/</link><description>Recent content on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 06 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="https://reionwong.github.io/index.xml" rel="self" type="application/rss+xml"/><item><title>Archives</title><link>https://reionwong.github.io/archives/</link><pubDate>Sun, 06 Mar 2022 00:00:00 +0000</pubDate><guid>https://reionwong.github.io/archives/</guid><description/></item><item><title>Wine HiDPI 补丁</title><link>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">&lt;span class="gh">diff --git a/dlls/win32u/font.c b/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">index f9a0359e92c..befdf5295ec 100644
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">&lt;/span>&lt;span class="gd">--- a/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gd">&lt;/span>&lt;span class="gi">+++ b/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span>&lt;span class="gu">@@ -48,6 +48,7 @@
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> WINE_DEFAULT_DEBUG_CHANNEL(font);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static HKEY wine_fonts_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+static HKEY control_panel_desktop_key;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> static HKEY wine_fonts_cache_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static HKEY hkcu_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">@@ -2751,6 +2752,9 @@ static void update_codepage( UINT screen_dpi )
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> if (size == sizeof(DWORD) &amp;amp;&amp;amp; info-&amp;gt;Type == REG_DWORD)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> font_dpi = *(DWORD *)info-&amp;gt;Data;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ // For CutefishOS.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ font_dpi = screen_dpi;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> ansi_cp = get_acp();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> oem_cp = get_oemcp();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sprintf( cpbuf, &amp;#34;%u,%u&amp;#34;, ansi_cp, oem_cp );
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">@@ -6355,9 +6359,23 @@ UINT font_init(void)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> {&amp;#39;S&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;f&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;w&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;r&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;\\&amp;#39;,&amp;#39;W&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;\\&amp;#39;,&amp;#39;F&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;s&amp;#39;};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static const WCHAR cacheW[] = {&amp;#39;C&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;c&amp;#39;,&amp;#39;h&amp;#39;,&amp;#39;e&amp;#39;};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ static const WCHAR desktop_keyW[] =
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ {&amp;#39;C&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;r&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39; &amp;#39;,&amp;#39;P&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39;\\&amp;#39;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ &amp;#39;D&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;s&amp;#39;,&amp;#39;k&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;p&amp;#39;};
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ static const WCHAR log_pixelsW[] = {&amp;#39;L&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;g&amp;#39;,&amp;#39;P&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;x&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39;s&amp;#39;,0};
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (!(hkcu_key = open_hkcu())) return 0;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wine_fonts_key = reg_create_key( hkcu_key, wine_fonts_keyW, sizeof(wine_fonts_keyW), 0, NULL );
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ control_panel_desktop_key = reg_create_key(hkcu_key, desktop_keyW, sizeof(desktop_keyW), 0, NULL);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (wine_fonts_key) dpi = init_font_options();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ char *system_dpi = getenv(&amp;#34;CUTEFISH_FONT_DPI&amp;#34;);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ if (system_dpi != NULL) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ dpi = atoi(system_dpi);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ set_reg_value( control_panel_desktop_key, log_pixelsW, REG_DWORD, &amp;amp;dpi, sizeof(dpi) );
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (!dpi) return 96;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> update_codepage( dpi );
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>当然让 wine 读取 xft.dpi 是更好的方案&amp;hellip;&lt;/p></description></item><item><title>Qt 程序国际化翻译</title><link>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</link><pubDate>Fri, 02 Apr 2021 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</guid><description>&lt;p>Qt 提供了支持 C++ 和 QML 的翻译工具，使用 lupdate 工具同步源代码，使用 lrelease 工具生成应用程序创建运行时使用的翻译文件。
+由于项目统一使用 CMake 工具来编译源代码，所以下面的教程使用 CMake 来讲解。
+需要注意的是 C++中使用 QObject::tr(&amp;quot;&amp;quot;) 的函数，QML 里使用 qStr(&amp;quot;&amp;quot;)&lt;/p>
+&lt;p>首先生成对应的 TS 文件（比如中文）：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">lupdate ./src -ts ./translations/zh_CN.ts
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>如果项目的源代码里有些需要翻译的字符串删除了，可以在后面加入一个参数：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">lupdate ./src -ts ./translations/zh_CN.ts -no-obsolete
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>它的作用就是删除所有过时和消失的字符串。&lt;/p>
+&lt;p>生成 TS 文件后可以用 Qt Linguist 来进行编辑翻译。&lt;/p>
+&lt;p>然后在 CMakeLists.txt 中加上下边代码片段：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">file&lt;span class="o">(&lt;/span>GLOB TS_FILES translations/*.ts&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">qt5_create_translation&lt;span class="o">(&lt;/span>QM_FILES &lt;span class="si">${&lt;/span>&lt;span class="nv">TS_FILES&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">add_custom_target&lt;span class="o">(&lt;/span>translations DEPENDS &lt;span class="si">${&lt;/span>&lt;span class="nv">QM_FILES&lt;/span>&lt;span class="si">}&lt;/span> SOURCES &lt;span class="si">${&lt;/span>&lt;span class="nv">TS_FILES&lt;/span>&lt;span class="si">}&lt;/span>&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">add_dependencies&lt;span class="o">(&lt;/span>&lt;span class="si">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="si">}&lt;/span> translations&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">install&lt;span class="o">(&lt;/span>FILES &lt;span class="si">${&lt;/span>&lt;span class="nv">QM_FILES&lt;/span>&lt;span class="si">}&lt;/span> DESTINATION /usr/share/&lt;span class="si">${&lt;/span>&lt;span class="nv">PROJECT_NAME&lt;/span>&lt;span class="si">}&lt;/span>/translations&lt;span class="o">)&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>C++代码：&lt;/p>
+&lt;p>在程序的 main 函数里加入下列代码。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;span class="lnt">8
+&lt;/span>&lt;span class="lnt">9
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QLocale&lt;/span> &lt;span class="n">locale&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QString&lt;/span> &lt;span class="n">qmFilePath&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;%1/%2.qm&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">arg&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/usr/share/xxx/translations/&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">arg&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">locale&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">name&lt;/span>&lt;span class="p">());&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">QFile&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">qmFilePath&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QTranslator&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">translator&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">QTranslator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">QGuiApplication&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">instance&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">translator&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">load&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">qmFilePath&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QGuiApplication&lt;/span>&lt;span class="o">::&lt;/span>&lt;span class="n">installTranslator&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">translator&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">translator&lt;/span>&lt;span class="o">-&amp;gt;&lt;/span>&lt;span class="n">deleteLater&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>替换 xxx 为你的项目名称&lt;/p></description></item><item><title>kylin-assistant 项目源码阅读笔记</title><link>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sun, 18 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;p>根据官方介绍，麒麟助手是优客团队推出的一款开源的 Linux 系统管理软件，将 Linux 系统命令行方式的系统管理操作方式转化为更易用的可视化操作。麒麟助手集清理加速、健康优化、个性设置以及功能大全于一体，是用户便捷又贴心的系统助手。&lt;/p>
 &lt;p>闲来无事就看了看这个项目，源码地址：https://github.com/eightplus/kylin-assistant&lt;/p>
 &lt;p>这个项目主要使用 C++、Python 进行开发，前端图形库使用强大的 Qt，后端使用 Python，前端与后端的通信是借助于 D-Bus，本文主要对后端代码进行剖析，看看它是如何获取系统信息。&lt;/p>
 &lt;h2 id="项目目录">项目目录&lt;/h2>

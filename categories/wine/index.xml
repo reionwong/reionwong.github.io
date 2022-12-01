@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Wine on Reion's Blog</title><link>https://reionwong.github.io/categories/wine/</link><description>Recent content in Wine on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 02 Oct 2021 12:20:06 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/wine/index.xml" rel="self" type="application/rss+xml"/><item><title>Wine HiDPI 补丁</title><link>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;span class="lnt">24
+&lt;/span>&lt;span class="lnt">25
+&lt;/span>&lt;span class="lnt">26
+&lt;/span>&lt;span class="lnt">27
+&lt;/span>&lt;span class="lnt">28
+&lt;/span>&lt;span class="lnt">29
+&lt;/span>&lt;span class="lnt">30
+&lt;/span>&lt;span class="lnt">31
+&lt;/span>&lt;span class="lnt">32
+&lt;/span>&lt;span class="lnt">33
+&lt;/span>&lt;span class="lnt">34
+&lt;/span>&lt;span class="lnt">35
+&lt;/span>&lt;span class="lnt">36
+&lt;/span>&lt;span class="lnt">37
+&lt;/span>&lt;span class="lnt">38
+&lt;/span>&lt;span class="lnt">39
+&lt;/span>&lt;span class="lnt">40
+&lt;/span>&lt;span class="lnt">41
+&lt;/span>&lt;span class="lnt">42
+&lt;/span>&lt;span class="lnt">43
+&lt;/span>&lt;span class="lnt">44
+&lt;/span>&lt;span class="lnt">45
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-diff" data-lang="diff">&lt;span class="line">&lt;span class="cl">&lt;span class="gh">diff --git a/dlls/win32u/font.c b/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">index f9a0359e92c..befdf5295ec 100644
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gh">&lt;/span>&lt;span class="gd">--- a/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gd">&lt;/span>&lt;span class="gi">+++ b/dlls/win32u/font.c
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span>&lt;span class="gu">@@ -48,6 +48,7 @@
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> WINE_DEFAULT_DEBUG_CHANNEL(font);
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static HKEY wine_fonts_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+static HKEY control_panel_desktop_key;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> static HKEY wine_fonts_cache_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static HKEY hkcu_key;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">@@ -2751,6 +2752,9 @@ static void update_codepage( UINT screen_dpi )
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> if (size == sizeof(DWORD) &amp;amp;&amp;amp; info-&amp;gt;Type == REG_DWORD)
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> font_dpi = *(DWORD *)info-&amp;gt;Data;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ // For CutefishOS.
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ font_dpi = screen_dpi;
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> ansi_cp = get_acp();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> oem_cp = get_oemcp();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sprintf( cpbuf, &amp;#34;%u,%u&amp;#34;, ansi_cp, oem_cp );
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">@@ -6355,9 +6359,23 @@ UINT font_init(void)
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gu">&lt;/span> {&amp;#39;S&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;f&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;w&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;r&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;\\&amp;#39;,&amp;#39;W&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;\\&amp;#39;,&amp;#39;F&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;s&amp;#39;};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> static const WCHAR cacheW[] = {&amp;#39;C&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;c&amp;#39;,&amp;#39;h&amp;#39;,&amp;#39;e&amp;#39;};
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ static const WCHAR desktop_keyW[] =
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ {&amp;#39;C&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;r&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39; &amp;#39;,&amp;#39;P&amp;#39;,&amp;#39;a&amp;#39;,&amp;#39;n&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39;\\&amp;#39;,
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ &amp;#39;D&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;s&amp;#39;,&amp;#39;k&amp;#39;,&amp;#39;t&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;p&amp;#39;};
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ static const WCHAR log_pixelsW[] = {&amp;#39;L&amp;#39;,&amp;#39;o&amp;#39;,&amp;#39;g&amp;#39;,&amp;#39;P&amp;#39;,&amp;#39;i&amp;#39;,&amp;#39;x&amp;#39;,&amp;#39;e&amp;#39;,&amp;#39;l&amp;#39;,&amp;#39;s&amp;#39;,0};
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (!(hkcu_key = open_hkcu())) return 0;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> wine_fonts_key = reg_create_key( hkcu_key, wine_fonts_keyW, sizeof(wine_fonts_keyW), 0, NULL );
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ control_panel_desktop_key = reg_create_key(hkcu_key, desktop_keyW, sizeof(desktop_keyW), 0, NULL);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (wine_fonts_key) dpi = init_font_options();
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ char *system_dpi = getenv(&amp;#34;CUTEFISH_FONT_DPI&amp;#34;);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ if (system_dpi != NULL) {
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ dpi = atoi(system_dpi);
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ set_reg_value( control_panel_desktop_key, log_pixelsW, REG_DWORD, &amp;amp;dpi, sizeof(dpi) );
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+ }
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">+
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="gi">&lt;/span> if (!dpi) return 96;
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> update_codepage( dpi );
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;p>当然让 wine 读取 xft.dpi 是更好的方案&amp;hellip;&lt;/p></description></item></channel></rss>
