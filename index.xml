@@ -3102,23 +3102,7 @@ data-flex-basis="387px"
 &lt;/div>
 &lt;/div>&lt;h2 id="相关链接">相关链接&lt;/h2>
 &lt;p>&lt;a class="link" href="https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/" target="_blank" rel="noopener"
->https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec&lt;/a>&lt;/p></description></item><item><title>俄语情怀</title><link>https://reionwong.github.io/p/%E4%BF%84%E8%AF%AD%E6%83%85%E6%80%80/</link><pubDate>Sat, 15 Sep 2018 14:25:37 +0800</pubDate><guid>https://reionwong.github.io/p/%E4%BF%84%E8%AF%AD%E6%83%85%E6%80%80/</guid><description>&lt;p>不知什么时候开始对俄语充满情怀，虽然没去过俄罗斯，但对俄罗斯文化挺感兴趣的，记得2017上半年的时候看了《战斗民族养成记》后，发疯了似得自学俄语，和学英语差不多，第一步要会读字母，俄语有33个字母，其中一个 p 舌颤音就让我折腾了一个月，那时候疯狂的在 Google、Youtube 上查资料，怎么发出舌颤音各种方法，才知道原来那是通过舌头吹气发出来的，舌尖轻轻放在上颚上，让气流“冲破”舌尖，使舌头震动，就像风吹过塑料布那样，很多人学俄语就卡在了这，包括我，因为发不出来就感觉很难，就萌发出放弃的思想，据说列宁和普京也不会舌颤音，最后我还是学会了；俄语字母手写体也很让人头疼，反正我是写不出，只会写印刷体。（&lt;/p>
-&lt;p>其实学习一门语言不外乎这几个步骤/方法：&lt;/p>
-&lt;ul>
-&lt;li>1、发音（比如字母，单词拼读）&lt;/li>
-&lt;li>2、积累词汇&lt;/li>
-&lt;li>3、语法&lt;/li>
-&lt;li>3、持之以恒的学习&lt;/li>
-&lt;/ul>
-&lt;p>最重要的当然是兴趣啦，兴趣是可以推动自己求知的内在力量，就会持续专心的专研它，从而提高学习效果；还通过电影、音乐等方式让你习惯它的存在&amp;hellip;&lt;/p>
-&lt;p>引用网易云音乐评论：&lt;/p>
-&lt;blockquote>
-&lt;blockquote>
-&lt;p>《Вечер бродит》每次听着这首苏联老歌都有一种复杂的情怀，因为心中依然飘荡着理想主义情怀，一个逝去的时代，一个红色国度用理想和浇铸意志。一些曾经充满横贯在几代人心中至今永远沉淀的豪情。苏维埃联盟是建立在梦想上的国家，她的信仰是伟大而坚定的，她只是被人类的自私与贪婪打败了。&lt;/p>
-&lt;/blockquote>
-&lt;/blockquote>
-&lt;h2 id="最后">最后&lt;/h2>
-&lt;p>精力有限，不能说是放弃了，暂时先把俄语放下。&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
+>https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
 &lt;h2 id="架构设计">架构设计&lt;/h2>
 &lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech.png"
 width="646"
