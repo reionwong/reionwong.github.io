@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on Reion's Blog</title><link>https://reionwong.github.io/categories/qt/</link><description>Recent content in Qt on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Apr 2022 14:28:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>QIconLoader 简单分析</title><link>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qt on Reion's Blog</title><link>https://reionwong.github.io/categories/qt/</link><description>Recent content in Qt on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 08 Apr 2022 14:28:38 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/qt/index.xml" rel="self" type="application/rss+xml"/><item><title>QIconLoader 简单分析</title><link>https://reionwong.github.io/p/qt-qiconloader/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qt-qiconloader/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
 &lt;p>QIconLoader 被设计成单实例，以便让其他模块方便使用，初始化时候首先会获取系统主题名称，如果提供主题为空则继续获取 systemFallbackThemeName()，并且会从 IconEngineFactoryLoader 的插件中查看是否支持 svg 格式。&lt;/p>
 &lt;p>在 Linux 中使用 Qt 开发 DE 的都会实现一个 Qt PlatformTheme 的插件，通过这个插件可以达到主题动态修改，在 QPlatformTheme 中重载实现，返回 themeHint() 中的 QPlatformTheme::SystemIconThemeName。&lt;/p>
 &lt;p>QIconLoader 包含以下模块：&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558.png"
 width="1166"
 height="513"
-srcset="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="227"
@@ -89,7 +89,7 @@ data-flex-basis="545px"
 &lt;ul>
 &lt;li>src/gui/image/qiconloader_p.h&lt;/li>
 &lt;li>src/gui/image/qiconloader.cpp&lt;/li>
-&lt;/ul></description></item><item><title>Qt 程序国际化翻译</title><link>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</link><pubDate>Fri, 02 Apr 2021 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</guid><description>&lt;p>Qt 提供了支持 C++ 和 QML 的翻译工具，使用 lupdate 工具同步源代码，使用 lrelease 工具生成应用程序创建运行时使用的翻译文件。
+&lt;/ul></description></item><item><title>Qt 程序国际化翻译</title><link>https://reionwong.github.io/p/qt-i18n/</link><pubDate>Fri, 02 Apr 2021 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qt-i18n/</guid><description>&lt;p>Qt 提供了支持 C++ 和 QML 的翻译工具，使用 lupdate 工具同步源代码，使用 lrelease 工具生成应用程序创建运行时使用的翻译文件。
 由于项目统一使用 CMake 工具来编译源代码，所以下面的教程使用 CMake 来讲解。
 需要注意的是 C++中使用 QObject::tr(&amp;quot;&amp;quot;) 的函数，QML 里使用 qStr(&amp;quot;&amp;quot;)&lt;/p>
 &lt;p>首先生成对应的 TS 文件（比如中文）：&lt;/p>
@@ -155,7 +155,7 @@ data-flex-basis="545px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>替换 xxx 为你的项目名称&lt;/p></description></item><item><title>记一次 QMimeData 在龙芯上的崩溃</title><link>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</link><pubDate>Thu, 08 Nov 2018 13:48:38 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</guid><description>&lt;p>deepin-editor 在龙芯下合并 tabbar 的时候导致崩溃，于是我就拿起了 gdb 调试，以下是栈信息：&lt;/p>
+&lt;/div>&lt;p>替换 xxx 为你的项目名称&lt;/p></description></item><item><title>记一次 QMimeData 在龙芯上的崩溃</title><link>https://reionwong.github.io/p/loongson-crash/</link><pubDate>Thu, 08 Nov 2018 13:48:38 +0800</pubDate><guid>https://reionwong.github.io/p/loongson-crash/</guid><description>&lt;p>deepin-editor 在龙芯下合并 tabbar 的时候导致崩溃，于是我就拿起了 gdb 调试，以下是栈信息：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
@@ -228,7 +228,7 @@ data-flex-basis="545px"
 &lt;/div>
 &lt;/div>&lt;h2 id="提交">提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://github.com/linuxdeepin/deepin-editor/commit/0dc5d62c300e102cf62d397e7163d8223b6a21af" target="_blank" rel="noopener"
->fix: drag and drop crash under loongson. · linuxdeepin/deepin-editor@0dc5d62 · GitHub&lt;/a>&lt;/p></description></item><item><title>解决 QToolTip 延迟隐藏问题</title><link>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 03 Nov 2018 08:40:42 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</guid><description>&lt;p>QToolTip 内部有一个继承 QLabel 的 QTipLabel，它把 Window flag 设为：Qt::ToolTip、Qt::BypassGraphicsProxyWidget，有两个 QBasicTimer 计时器：hideTimer，expireTimer，是用来做淡入淡出的效果，GTK 的 ToolTip 是没有这种延迟的，所以体验更好，延迟会造成一种心理作用，会认为是程序加载慢，很不爽。&lt;/p>
+>fix: drag and drop crash under loongson. · linuxdeepin/deepin-editor@0dc5d62 · GitHub&lt;/a>&lt;/p></description></item><item><title>解决 QToolTip 延迟隐藏问题</title><link>https://reionwong.github.io/p/qtooltip-hide-delay/</link><pubDate>Sat, 03 Nov 2018 08:40:42 +0800</pubDate><guid>https://reionwong.github.io/p/qtooltip-hide-delay/</guid><description>&lt;p>QToolTip 内部有一个继承 QLabel 的 QTipLabel，它把 Window flag 设为：Qt::ToolTip、Qt::BypassGraphicsProxyWidget，有两个 QBasicTimer 计时器：hideTimer，expireTimer，是用来做淡入淡出的效果，GTK 的 ToolTip 是没有这种延迟的，所以体验更好，延迟会造成一种心理作用，会认为是程序加载慢，很不爽。&lt;/p>
 &lt;p>然后某一天看到 @Blumia 同学提交文件管理器的 PR，也是把这个不清真的延迟去掉：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
@@ -278,7 +278,7 @@ data-flex-basis="545px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>通过 Qt 提供的 Meta-Object 机制，找到 QTipLabel 并直接关闭&lt;/p></description></item><item><title>解析 Linux 最近使用文件列表</title><link>https://reionwong.github.io/p/%E8%A7%A3%E6%9E%90-linux-%E6%9C%80%E8%BF%91%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</link><pubDate>Mon, 15 Oct 2018 20:00:28 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%A7%A3%E6%9E%90-linux-%E6%9C%80%E8%BF%91%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</guid><description>&lt;p>关于最近使用文件，freedesktop 定制了 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
+&lt;/div>&lt;p>通过 Qt 提供的 Meta-Object 机制，找到 QTipLabel 并直接关闭&lt;/p></description></item><item><title>Qt 解析 Linux 最近使用文件列表</title><link>https://reionwong.github.io/p/freedesktop-recent-qt/</link><pubDate>Mon, 15 Oct 2018 20:00:28 +0800</pubDate><guid>https://reionwong.github.io/p/freedesktop-recent-qt/</guid><description>&lt;p>关于最近使用文件，freedesktop 定制了 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
 >recent-file-spec&lt;/a>，为 X 桌面提供统一的标准，广泛被 Gnome、KDE 所使用，最近在深度文件管理器加上这个功能，所以了解了一下这个协议。&lt;/p>
 &lt;p>最近文件协议存储在 ~/.local/share/recently-used.xbel 里边，它用 xml 格式来进行存储，基本格式如下：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -374,7 +374,7 @@ data-flex-basis="545px"
 &lt;/div>
 &lt;/div>&lt;h2 id="相关提交">相关提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dde/dde-file-manager/&amp;#43;/38956/" target="_blank" rel="noopener"
->https://cr.deepin.io/#/c/dde/dde-file-manager/+/38956/&lt;/a>&lt;/p></description></item><item><title>QPlainTextEdit 文本光标绘制</title><link>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</link><pubDate>Thu, 11 Oct 2018 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</guid><description>&lt;p>发现在 Linux 下是没办法修改光标的颜色，在 Google、Qt 论坛搜索了一遍，还是解决不了。&lt;/p>
+>https://cr.deepin.io/#/c/dde/dde-file-manager/+/38956/&lt;/a>&lt;/p></description></item><item><title>QPlainTextEdit 文本光标绘制</title><link>https://reionwong.github.io/p/qplaintextedit-cursor-color/</link><pubDate>Thu, 11 Oct 2018 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qplaintextedit-cursor-color/</guid><description>&lt;p>发现在 Linux 下是没办法修改光标的颜色，在 Google、Qt 论坛搜索了一遍，还是解决不了。&lt;/p>
 &lt;p>今天看了一下 QPlainTextEdit 的 API 发现有 cursorRect() 这个函数，它返回光标所在的位置，突然灵感就来了，把 cursor 宽度设置为0，相当于把它给隐藏了，然后可以通过重写 paintEvent() 函数，在 viewport() 里绘制光标矩形，可以根据你想要的颜色来进行绘制。&lt;/p>
 &lt;h2 id="头文件">头文件&lt;/h2>
 &lt;div class="highlight">&lt;div class="chroma">

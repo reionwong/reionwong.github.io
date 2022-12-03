@@ -1,18 +1,18 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Design on Reion's Blog</title><link>https://reionwong.github.io/categories/design/</link><description>Recent content in Design on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 27 Nov 2022 14:03:28 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/design/index.xml" rel="self" type="application/rss+xml"/><item><title>Cutefish 桌面通知对话框设计的一个 Idea</title><link>https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/</link><pubDate>Sun, 27 Nov 2022 14:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/</guid><description>&lt;p>最近学习了一下 figma 进行设计，所以无意间把 cutefish desktop 搬上来了，开局先放张图，这个 Idea 来源于 iPhone 14 Pro 的灵动岛设计。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Design on Reion's Blog</title><link>https://reionwong.github.io/categories/design/</link><description>Recent content in Design on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 27 Nov 2022 14:03:28 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/design/index.xml" rel="self" type="application/rss+xml"/><item><title>Cutefish 桌面通知对话框设计的一个 Idea</title><link>https://reionwong.github.io/p/cutefish-desktop-notification-idea/</link><pubDate>Sun, 27 Nov 2022 14:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-desktop-notification-idea/</guid><description>&lt;p>最近学习了一下 figma 进行设计，所以无意间把 cutefish desktop 搬上来了，开局先放张图，这个 Idea 来源于 iPhone 14 Pro 的灵动岛设计。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop.png"
 width="2160"
 height="1467"
-srcset="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="147"
 data-flex-basis="353px"
 >&lt;/p>
 &lt;p>这个设计可以缓解桌面顶栏带来的占用空间，缺点就是显示的内容比较少，但是当你用鼠标 hover 到相关区域的时候，会进行展开，如下图所示：&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022.png"
 width="849"
 height="780"
-srcset="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="108"

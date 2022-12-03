@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Deepin on Reion's Blog</title><link>https://reionwong.github.io/categories/deepin/</link><description>Recent content in Deepin on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 14 Nov 2018 22:50:55 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/deepin/index.xml" rel="self" type="application/rss+xml"/><item><title>DRecentManager 一些记录</title><link>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</link><pubDate>Wed, 14 Nov 2018 22:50:55 +0800</pubDate><guid>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</guid><description>&lt;p>之前写过一篇《管理 Linux 最近文件列表》的文章，专门对 Qt 操作 xml 的方法进行了阐述，现在的 DDE 文件管理器添加的方法是只要你双击打开文件，就会自动添加到 xbel 文件中，这一步是文件管理器做的，正确的做法应该是让应用自己来实现，为了让 deepin 全家桶应用加上，就需要在 dtkcore 中添加接口了，于是就诞生了 DRecentManager。&lt;/p>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Deepin on Reion's Blog</title><link>https://reionwong.github.io/categories/deepin/</link><description>Recent content in Deepin on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Wed, 14 Nov 2018 22:50:55 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/deepin/index.xml" rel="self" type="application/rss+xml"/><item><title>DRecentManager 一些记录</title><link>https://reionwong.github.io/p/dde-recentmanager-detail/</link><pubDate>Wed, 14 Nov 2018 22:50:55 +0800</pubDate><guid>https://reionwong.github.io/p/dde-recentmanager-detail/</guid><description>&lt;p>之前写过一篇《管理 Linux 最近文件列表》的文章，专门对 Qt 操作 xml 的方法进行了阐述，现在的 DDE 文件管理器添加的方法是只要你双击打开文件，就会自动添加到 xbel 文件中，这一步是文件管理器做的，正确的做法应该是让应用自己来实现，为了让 deepin 全家桶应用加上，就需要在 dtkcore 中添加接口了，于是就诞生了 DRecentManager。&lt;/p>
 &lt;p>DRecentManager 是一个实现类似 GtkRecentManager 的一个类，主要用于管理最近使用的文件，删除和添加等等功能，方便 deepin 的应用把已打开的文件添加到 recent 列表中。&lt;/p>
 &lt;p>GtkRecentManager 用法很简单：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -506,25 +506,25 @@
 &lt;/div>
 &lt;/div>&lt;h2 id="提交">提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dtkcore/&amp;#43;/39727/" target="_blank" rel="noopener"
->https://cr.deepin.io/#/c/dtkcore/+/39727/&lt;/a>&lt;/p></description></item><item><title>DDE 通知服务技术细节原理</title><link>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</link><pubDate>Mon, 08 Oct 2018 23:19:46 +0800</pubDate><guid>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</guid><description>&lt;p>搬了一篇今年 4 月份写的文章，现在的 deepin-notifications 已经合并到 &lt;a class="link" href="https://github.com/linuxdeepin/dde-session-ui" target="_blank" rel="noopener"
+>https://cr.deepin.io/#/c/dtkcore/+/39727/&lt;/a>&lt;/p></description></item><item><title>DDE 通知服务技术细节原理</title><link>https://reionwong.github.io/p/dde-notifications/</link><pubDate>Mon, 08 Oct 2018 23:19:46 +0800</pubDate><guid>https://reionwong.github.io/p/dde-notifications/</guid><description>&lt;p>搬了一篇今年 4 月份写的文章，现在的 deepin-notifications 已经合并到 &lt;a class="link" href="https://github.com/linuxdeepin/dde-session-ui" target="_blank" rel="noopener"
 >dde-session-ui&lt;/a> 这个项目中了。&lt;/p>
 &lt;p>deepin-notifications 提供桌面通知服务，当有新的消息通知时就会在系统的右上角弹出消息通知对话框，按照 Deepin UI 设计规范做的，遵循了 freedesktop 标准来实现。&lt;/p>
 &lt;p>libnotify 是一个按照 &lt;a class="link" href="https://people.gnome.org/~mccann/docs/notification-spec/notification-spec-latest.html" target="_blank" rel="noopener"
 >Desktop Notifications Specification&lt;/a> (桌面通知规范) 实现的一个库，向通知守护进程发送桌面通知的函数库。这些通知可以用于通知用户一个事件或者显示某些形式的信息，而不用妨碍用户的操作，以异步的方式通知用户事件，并提供了一个 DBus 接口。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639.png"
 width="300"
 height="70"
-srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="428"
 data-flex-basis="1028px"
 >&lt;/p>
 &lt;h2 id="架构设计">架构设计&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-notifications/deepin_notifications.png"
 width="890"
 height="533"
-srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dde-notifications/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-notifications/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="166"
@@ -579,11 +579,11 @@ data-flex-basis="400px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;h2 id="最后">最后&lt;/h2>
-&lt;p>其实这个也没啥好写的，主要就是连接相关 DBus 接口，当接受到新消息时就做出处理，好了编不下去…&lt;/p></description></item><item><title>Deepin Editor 1.0 开发总结</title><link>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</link><pubDate>Sat, 06 Oct 2018 02:21:03 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</guid><description>&lt;p>前段时间把编辑器这个项目给接了过来，锻炼一下自己、练练手，经历了各种修修补补、增增删删的环节，刚看了一下 github，发现到如今我提交的 commit 也有 200+ 了&amp;hellip;&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134.png"
+&lt;p>其实这个也没啥好写的，主要就是连接相关 DBus 接口，当接受到新消息时就做出处理，好了编不下去…&lt;/p></description></item><item><title>Deepin Editor 1.0 开发总结</title><link>https://reionwong.github.io/p/dedit-1-0-summary/</link><pubDate>Sat, 06 Oct 2018 02:21:03 +0800</pubDate><guid>https://reionwong.github.io/p/dedit-1-0-summary/</guid><description>&lt;p>前段时间把编辑器这个项目给接了过来，锻炼一下自己、练练手，经历了各种修修补补、增增删删的环节，刚看了一下 github，发现到如今我提交的 commit 也有 200+ 了&amp;hellip;&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134.png"
 width="947"
 height="517"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="深度截图_选择区域_20181005232607.png"
 class="gallery-image"
@@ -593,10 +593,10 @@ data-flex-basis="439px"
 &lt;h2 id="介绍">介绍&lt;/h2>
 &lt;p>Deepin 为什么喜欢造轮子？主要是为了达到深度操作系统 &lt;strong>用户界面 / 用户体验&lt;/strong> 大统一的目标，今年的最主要目标不是造轮子，而是往系统稳定性的方向发展，所以造轮子是副业；虽然目前深度编辑器在技术方面还秒杀不了 KDE 家的 kate 编辑器，这个后面会讲到，但是在 UI/UX 这方面我觉得可以秒杀它们。&lt;/p>
 &lt;p>深度编辑器定位就是简单易用、轻量级的编辑器，目标就是要替换 gedit，保持深度编辑器的 UI/UX 和深度家族整体设计语言保持一致，比如我最近一直在写博客，很多文章就是通过深度编辑器来写的；论坛里边很多用户说很少用到编辑器，也就偶尔修改配置文件和 TXT 文件的时候会用到，属于轻度使用；在编程写代码这方面环境来看，都有专属的 IDE (集成开发环境)，所以用记事本来写代码的很少吧。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/dedit1.png"
 width="1026"
 height="619"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="主界面"
 class="gallery-image"
@@ -605,10 +605,10 @@ data-flex-basis="397px"
 >&lt;/p>
 &lt;p>顶部采用类似 Chrome 的标签栏设计，整体超窄边框显示，界面像深度终端那样简洁，不显示多余的东西，写作的沉浸感，带来了一种沉浸式的编辑体验。&lt;/p>
 &lt;p>多标签页设计支持将标签拖拽成窗口，或者将两个窗口拖拽到一个窗口里的另一个标签页。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu.png"
 width="189"
 height="436"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="右键智能菜单"
 class="gallery-image"
@@ -629,10 +629,10 @@ data-flex-basis="104px"
 &lt;h3 id="窗口管理">窗口管理&lt;/h3>
 &lt;p>既然是单进程多窗口模式，就不能在 main.cpp 里管理窗口创建/销毁了，保持 main 文件的代码简介，所以就诞生了 StartManager 类，所有窗口创建都在这个类里边进行管理，同时把创建过的窗口指针保存在一个 QList 里。&lt;/p>
 &lt;h3 id="窗口布局">窗口布局&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852.png"
 width="1240"
 height="659"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="前端布局"
 class="gallery-image"
@@ -649,10 +649,10 @@ data-flex-basis="451px"
 &lt;/ul>
 &lt;p>EditWrapper 其实主要就是封装了左侧的行号控件 + Qt 编辑框控件 QPlainTextEdit，在 EditWrapper 类里做了 openFile()、saveFile() 相关操作，也就是在这个类做了打开文件、保存文件的代码，Window 类会调用到此相关的函数。&lt;/p>
 &lt;h3 id="主题模块">主题模块&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e.png"
 width="233"
 height="256"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="Model View 概览"
 class="gallery-image"
@@ -669,10 +669,10 @@ data-flex-basis="218px"
 >KTextEditor&lt;/a> 了，那就先放一下了，这个时候想起了老王说的那句话：“很多时候技术上遇到瓶颈，千万不要放弃，先暂时放一下，灵感会随着你长时间的深入思考突然蹦出来的。”&lt;/p>
 &lt;p>至于为什么不用 &lt;a class="link" href="https://api.kde.org/frameworks/ktexteditor/html/" target="_blank" rel="noopener"
 >KTextEditor&lt;/a> ，这些依赖都不是盖的，哈哈哈。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a.png"
 width="1240"
 height="563"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="KTextEditor 依赖网"
 class="gallery-image"
@@ -682,10 +682,10 @@ data-flex-basis="528px"
 &lt;h2 id="高亮实现">高亮实现&lt;/h2>
 &lt;p>关于 Qt 语法高亮，Qt 官方文档有个很好的例子：&lt;a class="link" href="http://doc.qt.io/qt-5/qtwidgets-richtext-syntaxhighlighter-example.html" target="_blank" rel="noopener"
 >Syntax Highlighter Example&lt;/a>，QSyntaxHighlighter 允许自定义高亮规则，但是需要配合 QPlainTextEdit 来使用，如果未来自己实现一个编辑器控件的话，这个也是个问题。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955.png"
 width="213"
 height="132"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="KSyntaxHighlighting 依赖网"
 class="gallery-image"
@@ -698,7 +698,7 @@ data-flex-basis="387px"
 &lt;h2 id="polkit-提权实现">Polkit 提权实现&lt;/h2>
 &lt;p>待写。&lt;/p>
 &lt;h2 id="最后">最后&lt;/h2>
-&lt;p>之前一位社区开发者 @sonichy 问我：右键打开文件的时候是怎么实现在标签页中打开呢？我大概知道是什么意思了，最近没有时间回复，在这里可以回答一下。双击打开文件的时候文件管理器会调用对应的软件，并且会加上当前打开的文件地址字符串作为参数传进来编辑器，然后使用 QDBusInterface 作为远程对象接口代理，通过 callWithArgumentList() 调用远程接口，这样就实现了不打开新窗口。&lt;/p></description></item><item><title>深度文件管理器文件拷贝原理</title><link>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</guid><description>&lt;p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。&lt;/p>
+&lt;p>之前一位社区开发者 @sonichy 问我：右键打开文件的时候是怎么实现在标签页中打开呢？我大概知道是什么意思了，最近没有时间回复，在这里可以回答一下。双击打开文件的时候文件管理器会调用对应的软件，并且会加上当前打开的文件地址字符串作为参数传进来编辑器，然后使用 QDBusInterface 作为远程对象接口代理，通过 callWithArgumentList() 调用远程接口，这样就实现了不打开新窗口。&lt;/p></description></item><item><title>深度文件管理器文件拷贝原理</title><link>https://reionwong.github.io/p/dde-filemanager-cp/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>https://reionwong.github.io/p/dde-filemanager-cp/</guid><description>&lt;p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。&lt;/p>
 &lt;p>大概是这么一个流程：&lt;/p>
 &lt;ul>
 &lt;li>传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir)&lt;/li>
@@ -861,12 +861,12 @@ data-flex-basis="387px"
 >Linux 中的零拷贝技术 splice&lt;/a>&lt;/p>
 &lt;h2 id="最后">最后&lt;/h2>
 &lt;p>具体代码实现请看：&lt;a class="link" href="https://github.com/linuxdeepin/dde-file-manager/blob/e8bd4a23647eee871ad1caf8c10c465be2dbd6e7/fileoperations/filejob.cpp#L833" target="_blank" rel="noopener"
->filejob.cpp&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
+>filejob.cpp&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
 &lt;h2 id="架构设计">架构设计&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/tech.png"
 width="646"
 height="503"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="架构设计图.png"
 class="gallery-image"
@@ -891,10 +891,10 @@ data-flex-basis="308px"
 &lt;li>预览控件实现&lt;/li>
 &lt;/ul>
 &lt;h2 id="前端界面实现">前端界面实现&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202.png"
 width="520"
 height="440"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="deepin_20180310184202.png"
 class="gallery-image"
@@ -1114,10 +1114,10 @@ data-flex-basis="283px"
 &lt;p>参考：&lt;a class="link" href="https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html" target="_blank" rel="noopener"
 >freedesktop官方文档&lt;/a>&lt;/p>
 &lt;h3 id="字体预览控件">字体预览控件&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47.png"
 width="1280"
 height="762"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="预览效果图.png"
 class="gallery-image"
@@ -1127,10 +1127,10 @@ data-flex-basis="403px"
 &lt;p>控件基于 QWidget，传入一个字体文件路径，然后载入该字体（使用 QFontDatabase 类），重载 paintEvent 事件绘画预览内容，整个窗口大小为屏幕大小 ÷ 1.5。&lt;/p>
 &lt;h4 id="获取预览内容">获取预览内容&lt;/h4>
 &lt;p>加载所有语言的示例文本内容，检查打开的字体是否支持当前系统语言的预览内容显示（使用 freetype 库），如果不支持就判断英文的预览内容，还是不支持的话自动生成一串 unicode 进行预览（例如图标字体，由 freetype 生成）；字号由小到大，一到三行为固定字符串；三行以下为预览内容。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE.png"
 width="573"
 height="710"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="获取预览内容流程图.png"
 class="gallery-image"

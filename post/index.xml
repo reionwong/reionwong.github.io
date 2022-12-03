@@ -1,30 +1,138 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Reion's Blog</title><link>https://reionwong.github.io/post/</link><description>Recent content in Posts on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 27 Nov 2022 14:03:28 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Cutefish 桌面通知对话框设计的一个 Idea</title><link>https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/</link><pubDate>Sun, 27 Nov 2022 14:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/</guid><description>&lt;p>最近学习了一下 figma 进行设计，所以无意间把 cutefish desktop 搬上来了，开局先放张图，这个 Idea 来源于 iPhone 14 Pro 的灵动岛设计。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop.png"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Reion's Blog</title><link>https://reionwong.github.io/post/</link><description>Recent content in Posts on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 27 Nov 2022 14:03:28 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Cutefish 桌面通知对话框设计的一个 Idea</title><link>https://reionwong.github.io/p/cutefish-desktop-notification-idea/</link><pubDate>Sun, 27 Nov 2022 14:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-desktop-notification-idea/</guid><description>&lt;p>最近学习了一下 figma 进行设计，所以无意间把 cutefish desktop 搬上来了，开局先放张图，这个 Idea 来源于 iPhone 14 Pro 的灵动岛设计。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop.png"
 width="2160"
 height="1467"
-srcset="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-desktop-notification-idea/desktop_hucae1cd91e534c9c8d96cc1fefbb08f2c_1566368_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="147"
 data-flex-basis="353px"
 >&lt;/p>
 &lt;p>这个设计可以缓解桌面顶栏带来的占用空间，缺点就是显示的内容比较少，但是当你用鼠标 hover 到相关区域的时候，会进行展开，如下图所示：&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022.png"
 width="849"
 height="780"
-srcset="https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-%E6%A1%8C%E9%9D%A2%E9%80%9A%E7%9F%A5%E5%AF%B9%E8%AF%9D%E6%A1%86%E8%AE%BE%E8%AE%A1%E7%9A%84%E4%B8%80%E4%B8%AA-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-desktop-notification-idea/Screenshot_20221201_235022_hu6a472eef10a4757f5d1284486a996cac_46800_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="108"
 data-flex-basis="261px"
->&lt;/p></description></item><item><title>QIconLoader 简单分析</title><link>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
+>&lt;/p></description></item><item><title>Cutefish 菜单栏背景颜色识别方案</title><link>https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/</link><pubDate>Mon, 25 Jul 2022 12:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/</guid><description>&lt;p>macOS Big Sur 版本中顶部菜单栏引入了一个新特性，就是菜单栏背景颜色与桌面壁纸适应效果，相比之前更加融合。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image.png"
+width="512"
+height="129"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image_hu192d69efe00b1b5867b33a6a04f1120d_50833_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image_hu192d69efe00b1b5867b33a6a04f1120d_50833_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="396"
+data-flex-basis="952px"
+>&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2.png"
+width="512"
+height="129"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2_hue71b3da5b0aab8c8ed1bc3c9cd24df9d_72859_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2_hue71b3da5b0aab8c8ed1bc3c9cd24df9d_72859_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="396"
+data-flex-basis="952px"
+>&lt;/p>
+&lt;p>从实际效果中看不仅仅是将背景透明+模糊，它会根据壁纸图片顶部区域中提取主题颜色。&lt;/p>
+&lt;h2 id="实现方案">实现方案&lt;/h2>
+&lt;h3 id="平均值法">平均值法&lt;/h3>
+&lt;p>将图像数据中所有的 rgb 值加起来，再除以图像的面积，求平均值。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QImage&lt;/span> &lt;span class="nf">img&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;fileName&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QSize&lt;/span> &lt;span class="n">size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">img&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">long&lt;/span> &lt;span class="kt">long&lt;/span> &lt;span class="n">sumR&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumG&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumB&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 面积
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">measureArea&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">width&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 遍历图片每一个坐标
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QRgb&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">line&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">QRgb&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">img&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">scanLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">width&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumR&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qRed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumG&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qGreen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumB&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qBlue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumR&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumG&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumB&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QColor&lt;/span> &lt;span class="n">themeColor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sumR&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumG&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumB&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="字体颜色适应背景方案">字体颜色适应背景方案&lt;/h3>
+&lt;p>公式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.299&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">g&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.587&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.114&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">186&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s">&amp;#34;black&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;white&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="效果图">效果图&lt;/h2>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1.png"
+width="2559"
+height="1599"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1_hu461a5379f751aadc85ff6e95de52a521_807934_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1_hu461a5379f751aadc85ff6e95de52a521_807934_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2.png"
+width="2559"
+height="1599"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2_huf96758c5b8de123b71b47686dbb77c71_2205882_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2_huf96758c5b8de123b71b47686dbb77c71_2205882_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>&lt;/p>
+&lt;h2 id="相关代码">相关代码&lt;/h2>
+&lt;p>&lt;a class="link" href="https://github.com/cutefishos/statusbar/commit/081cd78dc20a88a7e50a402d6c40b9047018494c" target="_blank" rel="noopener"
+>https://github.com/cutefishos/statusbar/commit/081cd78dc20a88a7e50a402d6c40b9047018494c&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/cutefishos/statusbar/commit/7aa179e6b2663cafb9749ed3324b673a8a454182" target="_blank" rel="noopener"
+>https://github.com/cutefishos/statusbar/commit/7aa179e6b2663cafb9749ed3324b673a8a454182&lt;/a>&lt;/p></description></item><item><title>QIconLoader 简单分析</title><link>https://reionwong.github.io/p/qt-qiconloader/</link><pubDate>Fri, 08 Apr 2022 14:28:38 +0800</pubDate><guid>https://reionwong.github.io/p/qt-qiconloader/</guid><description>&lt;p>该类是用于 QIcon 的详细实现细节类，其关键核心点在于 System Icon Theme 的图标查找。&lt;/p>
 &lt;p>QIconLoader 被设计成单实例，以便让其他模块方便使用，初始化时候首先会获取系统主题名称，如果提供主题为空则继续获取 systemFallbackThemeName()，并且会从 IconEngineFactoryLoader 的插件中查看是否支持 svg 格式。&lt;/p>
 &lt;p>在 Linux 中使用 Qt 开发 DE 的都会实现一个 Qt PlatformTheme 的插件，通过这个插件可以达到主题动态修改，在 QPlatformTheme 中重载实现，返回 themeHint() 中的 QPlatformTheme::SystemIconThemeName。&lt;/p>
 &lt;p>QIconLoader 包含以下模块：&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558.png"
 width="1166"
 height="513"
-srcset="https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qiconloader-%E7%AE%80%E5%8D%95%E5%88%86%E6%9E%90/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/qt-qiconloader/Screenshot_173558_hu123a84db17e484a1a288b80ff1faab9d_43941_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="227"
@@ -108,7 +216,7 @@ data-flex-basis="545px"
 &lt;ul>
 &lt;li>src/gui/image/qiconloader_p.h&lt;/li>
 &lt;li>src/gui/image/qiconloader.cpp&lt;/li>
-&lt;/ul></description></item><item><title>Wine HiDPI 补丁</title><link>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-%E8%A1%A5%E4%B8%81/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
+&lt;/ul></description></item><item><title>Wine HiDPI Patch</title><link>https://reionwong.github.io/p/wine-hidpi-patch/</link><pubDate>Sat, 02 Oct 2021 12:20:06 +0800</pubDate><guid>https://reionwong.github.io/p/wine-hidpi-patch/</guid><description>&lt;p>wine 运行的 windows 应用不读取 xresource 的 dpi 属性，在 cutefish 中的解决方案为，读取环境变量设置注册表：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
@@ -205,7 +313,7 @@ data-flex-basis="545px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> update_codepage( dpi );
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>当然让 wine 读取 xft.dpi 是更好的方案&amp;hellip;&lt;/p></description></item><item><title>Qt 程序国际化翻译</title><link>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</link><pubDate>Fri, 02 Apr 2021 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qt-%E7%A8%8B%E5%BA%8F%E5%9B%BD%E9%99%85%E5%8C%96%E7%BF%BB%E8%AF%91/</guid><description>&lt;p>Qt 提供了支持 C++ 和 QML 的翻译工具，使用 lupdate 工具同步源代码，使用 lrelease 工具生成应用程序创建运行时使用的翻译文件。
+&lt;/div>&lt;p>当然让 wine 读取 xft.dpi 是更好的方案&amp;hellip;&lt;/p></description></item><item><title>Qt 程序国际化翻译</title><link>https://reionwong.github.io/p/qt-i18n/</link><pubDate>Fri, 02 Apr 2021 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qt-i18n/</guid><description>&lt;p>Qt 提供了支持 C++ 和 QML 的翻译工具，使用 lupdate 工具同步源代码，使用 lrelease 工具生成应用程序创建运行时使用的翻译文件。
 由于项目统一使用 CMake 工具来编译源代码，所以下面的教程使用 CMake 来讲解。
 需要注意的是 C++中使用 QObject::tr(&amp;quot;&amp;quot;) 的函数，QML 里使用 qStr(&amp;quot;&amp;quot;)&lt;/p>
 &lt;p>首先生成对应的 TS 文件（比如中文）：&lt;/p>
@@ -271,7 +379,7 @@ data-flex-basis="545px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>替换 xxx 为你的项目名称&lt;/p></description></item><item><title>kylin-assistant 项目源码阅读笔记</title><link>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</link><pubDate>Sun, 18 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/kylin-assistant-%E9%A1%B9%E7%9B%AE%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB%E7%AC%94%E8%AE%B0/</guid><description>&lt;p>根据官方介绍，麒麟助手是优客团队推出的一款开源的 Linux 系统管理软件，将 Linux 系统命令行方式的系统管理操作方式转化为更易用的可视化操作。麒麟助手集清理加速、健康优化、个性设置以及功能大全于一体，是用户便捷又贴心的系统助手。&lt;/p>
+&lt;/div>&lt;p>替换 xxx 为你的项目名称&lt;/p></description></item><item><title>kylin-assistant 项目源码阅读笔记</title><link>https://reionwong.github.io/p/kylin-assistant-note/</link><pubDate>Sun, 18 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/kylin-assistant-note/</guid><description>&lt;p>根据官方介绍，麒麟助手是优客团队推出的一款开源的 Linux 系统管理软件，将 Linux 系统命令行方式的系统管理操作方式转化为更易用的可视化操作。麒麟助手集清理加速、健康优化、个性设置以及功能大全于一体，是用户便捷又贴心的系统助手。&lt;/p>
 &lt;p>闲来无事就看了看这个项目，源码地址：https://github.com/eightplus/kylin-assistant&lt;/p>
 &lt;p>这个项目主要使用 C++、Python 进行开发，前端图形库使用强大的 Qt，后端使用 Python，前端与后端的通信是借助于 D-Bus，本文主要对后端代码进行剖析，看看它是如何获取系统信息。&lt;/p>
 &lt;h2 id="项目目录">项目目录&lt;/h2>
@@ -552,11 +660,11 @@ Home 路径：&lt;code>GLib.get_home_dir()&lt;/code>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;p>首先检查 &lt;code>/etc/ubuntukylin-release&lt;/code> 是否存在，如果存在就对每一行进行解析，如遇到 &lt;code>DISTRIB_DESCRIPTION&lt;/code> 字段则截取无关字符串最后得到结果。&lt;/p>
-&lt;p>如果不存在上面的 &lt;code>ubuntukylin-release&lt;/code> 文件(这是 ubuntukylin 专有的 release 文件)，则判断 &lt;code>/etc/os-release&lt;/code> 文件，这是众多发行版的统一标准，然后逻辑与上面说明一致。&lt;/p></description></item><item><title>什么是 PGP 加密以及它如何工作？</title><link>https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/</link><pubDate>Tue, 13 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/</guid><description>&lt;p>当你使用 ProtonMail 发送加密电子邮件时，你的信息将会使用 PGP 加密进行保护。关于什么是 PGP，本文解释了我们安全承诺背后的技术。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM.jpg"
+&lt;p>如果不存在上面的 &lt;code>ubuntukylin-release&lt;/code> 文件(这是 ubuntukylin 专有的 release 文件)，则判断 &lt;code>/etc/os-release&lt;/code> 文件，这是众多发行版的统一标准，然后逻辑与上面说明一致。&lt;/p></description></item><item><title>什么是 PGP 加密以及它如何工作？</title><link>https://reionwong.github.io/p/what-is-pgp-encryption/</link><pubDate>Tue, 13 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/what-is-pgp-encryption/</guid><description>&lt;p>当你使用 ProtonMail 发送加密电子邮件时，你的信息将会使用 PGP 加密进行保护。关于什么是 PGP，本文解释了我们安全承诺背后的技术。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM.jpg"
 width="1024"
 height="512"
-srcset="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_480x0_resize_q75_box.jpg 480w, https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_1024x0_resize_q75_box.jpg 1024w"
+srcset="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_480x0_resize_q75_box.jpg 480w, https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_1024x0_resize_q75_box.jpg 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="200"
@@ -575,10 +683,10 @@ data-flex-basis="480px"
 &lt;p>从历史上看，PGP 很难使用，需要在电子邮件提供商或客户端的基础之上增加额外的应用程序。你还必须手动生成加密密钥并与联系人交换密钥。使用 ProtonMail，PGP 是内置的，并且自动运行且无形的。当你使用另一个 ProtonMail 用户编写电子邮件并发送时，邮件加密和签名将自动进行。你无需做任何事情或需要任何专业技术知识。ProtonMail 使 PGP 加密变得更简单、方便。&lt;/p>
 &lt;h2 id="pgp-如何运作">PGP 如何运作？&lt;/h2>
 &lt;p>查看这张图来理解 PGP 加密是如何工作是非常有用的，PGP 使用对称密钥加密（即一次性会话密钥加密和解密消息）和公共密钥加密（即接收者独有的密钥加密和解密会话密钥）的组合。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM.png"
 width="1220"
 height="610"
-srcset="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="200"
@@ -617,7 +725,7 @@ data-flex-basis="480px"
 &lt;p>随着超级计算机变得更快，新的加密标准越来越受欢迎，ProtonMail 将继续适应新的网络威胁和用户的需求。我们的密码学家正在努力开展新项目，如关键透明度和源代码透明度。我们最近还将用户升级为&lt;a class="link" href="https://protonmail.com/blog/elliptic-curve-cryptography/" target="_blank" rel="noopener"
 >椭圆曲线加密&lt;/a>，从而最大限度地提高了安全性和效率。 在我们社区的支持下，我们正在经过时间考验的基础上建立一个更安全的互联网。&lt;/p>
 &lt;p>英文原文：&lt;a class="link" href="https://protonmail.com/blog/what-is-pgp-encryption/" target="_blank" rel="noopener"
->https://protonmail.com/blog/what-is-pgp-encryption/&lt;/a>&lt;/p></description></item><item><title>Github 使用 GPG 签名验证</title><link>https://reionwong.github.io/p/github-%E4%BD%BF%E7%94%A8-gpg-%E7%AD%BE%E5%90%8D%E9%AA%8C%E8%AF%81/</link><pubDate>Sat, 03 Aug 2019 01:35:56 +0800</pubDate><guid>https://reionwong.github.io/p/github-%E4%BD%BF%E7%94%A8-gpg-%E7%AD%BE%E5%90%8D%E9%AA%8C%E8%AF%81/</guid><description>&lt;p>GPG 是一个用于数据加密和数字签名的程序，由于被广泛应用，后来形成了一个开放的标准 OpenPGP，而 GnuPG 是实现了该标准的一个开源程序，在 Linux 下可以使用 GnuPG 来管理密钥、加密解密文件、电子邮件、数字签名文件等内容。&lt;/p>
+>https://protonmail.com/blog/what-is-pgp-encryption/&lt;/a>&lt;/p></description></item><item><title>Github 使用 GPG 签名验证</title><link>https://reionwong.github.io/p/github-using-gpg/</link><pubDate>Sat, 03 Aug 2019 01:35:56 +0800</pubDate><guid>https://reionwong.github.io/p/github-using-gpg/</guid><description>&lt;p>GPG 是一个用于数据加密和数字签名的程序，由于被广泛应用，后来形成了一个开放的标准 OpenPGP，而 GnuPG 是实现了该标准的一个开源程序，在 Linux 下可以使用 GnuPG 来管理密钥、加密解密文件、电子邮件、数字签名文件等内容。&lt;/p>
 &lt;p>在 Linux 下，一般可以在系统软件源中找到 GnuPG，比如 debian 发行版可以通过以下命令安装：&lt;/p>
 &lt;p>&lt;code>$ sudo apt install gnupg&lt;/code>&lt;/p>
 &lt;h2 id="gnupg-简单用法">GnuPG 简单用法&lt;/h2>
@@ -682,7 +790,7 @@ data-flex-basis="480px"
 &lt;p>&lt;code>$ git tag -s xxx&lt;/code>&lt;/p>
 &lt;p>验证签名 tag：&lt;code>$ git tag -v xxx&lt;/code>&lt;/p>
 &lt;p>参考: &lt;a class="link" href="https://help.github.com/en/articles/managing-commit-signature-verification" target="_blank" rel="noopener"
->https://help.github.com/en/articles/managing-commit-signature-verification&lt;/a>&lt;/p></description></item><item><title>DRecentManager 一些记录</title><link>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</link><pubDate>Wed, 14 Nov 2018 22:50:55 +0800</pubDate><guid>https://reionwong.github.io/p/drecentmanager-%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</guid><description>&lt;p>之前写过一篇《管理 Linux 最近文件列表》的文章，专门对 Qt 操作 xml 的方法进行了阐述，现在的 DDE 文件管理器添加的方法是只要你双击打开文件，就会自动添加到 xbel 文件中，这一步是文件管理器做的，正确的做法应该是让应用自己来实现，为了让 deepin 全家桶应用加上，就需要在 dtkcore 中添加接口了，于是就诞生了 DRecentManager。&lt;/p>
+>https://help.github.com/en/articles/managing-commit-signature-verification&lt;/a>&lt;/p></description></item><item><title>DRecentManager 一些记录</title><link>https://reionwong.github.io/p/dde-recentmanager-detail/</link><pubDate>Wed, 14 Nov 2018 22:50:55 +0800</pubDate><guid>https://reionwong.github.io/p/dde-recentmanager-detail/</guid><description>&lt;p>之前写过一篇《管理 Linux 最近文件列表》的文章，专门对 Qt 操作 xml 的方法进行了阐述，现在的 DDE 文件管理器添加的方法是只要你双击打开文件，就会自动添加到 xbel 文件中，这一步是文件管理器做的，正确的做法应该是让应用自己来实现，为了让 deepin 全家桶应用加上，就需要在 dtkcore 中添加接口了，于是就诞生了 DRecentManager。&lt;/p>
 &lt;p>DRecentManager 是一个实现类似 GtkRecentManager 的一个类，主要用于管理最近使用的文件，删除和添加等等功能，方便 deepin 的应用把已打开的文件添加到 recent 列表中。&lt;/p>
 &lt;p>GtkRecentManager 用法很简单：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -1190,7 +1298,7 @@ data-flex-basis="480px"
 &lt;/div>
 &lt;/div>&lt;h2 id="提交">提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dtkcore/&amp;#43;/39727/" target="_blank" rel="noopener"
->https://cr.deepin.io/#/c/dtkcore/+/39727/&lt;/a>&lt;/p></description></item><item><title>记一次 QMimeData 在龙芯上的崩溃</title><link>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</link><pubDate>Thu, 08 Nov 2018 13:48:38 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%AE%B0%E4%B8%80%E6%AC%A1-qmimedata-%E5%9C%A8%E9%BE%99%E8%8A%AF%E4%B8%8A%E7%9A%84%E5%B4%A9%E6%BA%83/</guid><description>&lt;p>deepin-editor 在龙芯下合并 tabbar 的时候导致崩溃，于是我就拿起了 gdb 调试，以下是栈信息：&lt;/p>
+>https://cr.deepin.io/#/c/dtkcore/+/39727/&lt;/a>&lt;/p></description></item><item><title>记一次 QMimeData 在龙芯上的崩溃</title><link>https://reionwong.github.io/p/loongson-crash/</link><pubDate>Thu, 08 Nov 2018 13:48:38 +0800</pubDate><guid>https://reionwong.github.io/p/loongson-crash/</guid><description>&lt;p>deepin-editor 在龙芯下合并 tabbar 的时候导致崩溃，于是我就拿起了 gdb 调试，以下是栈信息：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
 &lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
@@ -1263,7 +1371,7 @@ data-flex-basis="480px"
 &lt;/div>
 &lt;/div>&lt;h2 id="提交">提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://github.com/linuxdeepin/deepin-editor/commit/0dc5d62c300e102cf62d397e7163d8223b6a21af" target="_blank" rel="noopener"
->fix: drag and drop crash under loongson. · linuxdeepin/deepin-editor@0dc5d62 · GitHub&lt;/a>&lt;/p></description></item><item><title>解决 QToolTip 延迟隐藏问题</title><link>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</link><pubDate>Sat, 03 Nov 2018 08:40:42 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%A7%A3%E5%86%B3-qtooltip-%E5%BB%B6%E8%BF%9F%E9%9A%90%E8%97%8F%E9%97%AE%E9%A2%98/</guid><description>&lt;p>QToolTip 内部有一个继承 QLabel 的 QTipLabel，它把 Window flag 设为：Qt::ToolTip、Qt::BypassGraphicsProxyWidget，有两个 QBasicTimer 计时器：hideTimer，expireTimer，是用来做淡入淡出的效果，GTK 的 ToolTip 是没有这种延迟的，所以体验更好，延迟会造成一种心理作用，会认为是程序加载慢，很不爽。&lt;/p>
+>fix: drag and drop crash under loongson. · linuxdeepin/deepin-editor@0dc5d62 · GitHub&lt;/a>&lt;/p></description></item><item><title>解决 QToolTip 延迟隐藏问题</title><link>https://reionwong.github.io/p/qtooltip-hide-delay/</link><pubDate>Sat, 03 Nov 2018 08:40:42 +0800</pubDate><guid>https://reionwong.github.io/p/qtooltip-hide-delay/</guid><description>&lt;p>QToolTip 内部有一个继承 QLabel 的 QTipLabel，它把 Window flag 设为：Qt::ToolTip、Qt::BypassGraphicsProxyWidget，有两个 QBasicTimer 计时器：hideTimer，expireTimer，是用来做淡入淡出的效果，GTK 的 ToolTip 是没有这种延迟的，所以体验更好，延迟会造成一种心理作用，会认为是程序加载慢，很不爽。&lt;/p>
 &lt;p>然后某一天看到 @Blumia 同学提交文件管理器的 PR，也是把这个不清真的延迟去掉：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
 &lt;table class="lntable">&lt;tr>&lt;td class="lntd">
@@ -1313,7 +1421,7 @@ data-flex-basis="480px"
 &lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>通过 Qt 提供的 Meta-Object 机制，找到 QTipLabel 并直接关闭&lt;/p></description></item><item><title>C++ PIMPL 设计模式</title><link>https://reionwong.github.io/p/c-pimpl-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</link><pubDate>Sat, 27 Oct 2018 12:22:11 +0800</pubDate><guid>https://reionwong.github.io/p/c-pimpl-%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/</guid><description>&lt;p>PIMPL 被称为 pointer to implementation 或 private implementation，在很多 C++ 项目/开发库中都是很常见的，比如 deepin 的 dtkwidget 项目，简单理解就是在公共接口里封装私有数据和方法，它将类的实现细节放在分离的指针访问类中。该方法用于构造稳定的 ABI 的 C++ 库接口，及减少编译时依赖。&lt;/p>
+&lt;/div>&lt;p>通过 Qt 提供的 Meta-Object 机制，找到 QTipLabel 并直接关闭&lt;/p></description></item><item><title>C++ PIMPL 设计模式</title><link>https://reionwong.github.io/p/cpp-pimpl/</link><pubDate>Sat, 27 Oct 2018 12:22:11 +0800</pubDate><guid>https://reionwong.github.io/p/cpp-pimpl/</guid><description>&lt;p>PIMPL 被称为 pointer to implementation 或 private implementation，在很多 C++ 项目/开发库中都是很常见的，比如 deepin 的 dtkwidget 项目，简单理解就是在公共接口里封装私有数据和方法，它将类的实现细节放在分离的指针访问类中。该方法用于构造稳定的 ABI 的 C++ 库接口，及减少编译时依赖。&lt;/p>
 &lt;h2 id="实现">实现&lt;/h2>
 &lt;p>在现代 C++ 不鼓励使用 owning raw pointers，我们可以使用智能指针实现 PIMPL。&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -1394,7 +1502,7 @@ data-flex-basis="480px"
 &lt;/div>
 &lt;/div>&lt;h2 id="最后">最后&lt;/h2>
 &lt;p>我们知道 C++ 头文件(.h)和源文件(.cpp)，一旦头文件发生变化，不管多小的改变，所有引用它的文件都必须重新编译，对于一个很大的项目编译就会耗费大量的时间，利用 PIMPL 封装到一个类中，就可以减少编译依赖，起到了减少编译时间的效果。&lt;/p>
-&lt;p>d-pointer 模式是不透明指针实现之一，d-pointer 是类的私有数据成员，一方面好处是编译速度更快，因为头文件更改频率较低，d-pointer 在 Qt、KDE 库中大量使用。&lt;/p></description></item><item><title>解析 Linux 最近使用文件列表</title><link>https://reionwong.github.io/p/%E8%A7%A3%E6%9E%90-linux-%E6%9C%80%E8%BF%91%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</link><pubDate>Mon, 15 Oct 2018 20:00:28 +0800</pubDate><guid>https://reionwong.github.io/p/%E8%A7%A3%E6%9E%90-linux-%E6%9C%80%E8%BF%91%E4%BD%BF%E7%94%A8%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</guid><description>&lt;p>关于最近使用文件，freedesktop 定制了 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
+&lt;p>d-pointer 模式是不透明指针实现之一，d-pointer 是类的私有数据成员，一方面好处是编译速度更快，因为头文件更改频率较低，d-pointer 在 Qt、KDE 库中大量使用。&lt;/p></description></item><item><title>Qt 解析 Linux 最近使用文件列表</title><link>https://reionwong.github.io/p/freedesktop-recent-qt/</link><pubDate>Mon, 15 Oct 2018 20:00:28 +0800</pubDate><guid>https://reionwong.github.io/p/freedesktop-recent-qt/</guid><description>&lt;p>关于最近使用文件，freedesktop 定制了 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
 >recent-file-spec&lt;/a>，为 X 桌面提供统一的标准，广泛被 Gnome、KDE 所使用，最近在深度文件管理器加上这个功能，所以了解了一下这个协议。&lt;/p>
 &lt;p>最近文件协议存储在 ~/.local/share/recently-used.xbel 里边，它用 xml 格式来进行存储，基本格式如下：&lt;/p>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -1490,13 +1598,13 @@ data-flex-basis="480px"
 &lt;/div>
 &lt;/div>&lt;h2 id="相关提交">相关提交&lt;/h2>
 &lt;p>&lt;a class="link" href="https://cr.deepin.io/#/c/dde/dde-file-manager/&amp;#43;/38956/" target="_blank" rel="noopener"
->https://cr.deepin.io/#/c/dde/dde-file-manager/+/38956/&lt;/a>&lt;/p></description></item><item><title>C++ 计算今年过去时间百分比</title><link>https://reionwong.github.io/p/c-%E8%AE%A1%E7%AE%97%E4%BB%8A%E5%B9%B4%E8%BF%87%E5%8E%BB%E6%97%B6%E9%97%B4%E7%99%BE%E5%88%86%E6%AF%94/</link><pubDate>Mon, 15 Oct 2018 16:47:51 +0800</pubDate><guid>https://reionwong.github.io/p/c-%E8%AE%A1%E7%AE%97%E4%BB%8A%E5%B9%B4%E8%BF%87%E5%8E%BB%E6%97%B6%E9%97%B4%E7%99%BE%E5%88%86%E6%AF%94/</guid><description>&lt;p>昨晚在 App Store 看到了一款应用，这个应用提供了一个 widget 来显示今年已经过去了多少，提醒你珍惜自己的时间，每过去大约 52 分钟，百分比就会增长 0.01%，但是要付费，但是 3 块钱不贵，我就直接买了支持一下作者，看了作者头像是只猫，恩看来很多程序员是喜欢猫的 :)&lt;/p>
+>https://cr.deepin.io/#/c/dde/dde-file-manager/+/38956/&lt;/a>&lt;/p></description></item><item><title>C++ 计算今年过去时间百分比</title><link>https://reionwong.github.io/p/cpp-year-percent/</link><pubDate>Mon, 15 Oct 2018 16:47:51 +0800</pubDate><guid>https://reionwong.github.io/p/cpp-year-percent/</guid><description>&lt;p>昨晚在 App Store 看到了一款应用，这个应用提供了一个 widget 来显示今年已经过去了多少，提醒你珍惜自己的时间，每过去大约 52 分钟，百分比就会增长 0.01%，但是要付费，但是 3 块钱不贵，我就直接买了支持一下作者，看了作者头像是只猫，恩看来很多程序员是喜欢猫的 :)&lt;/p>
 &lt;p>&lt;a class="link" href="https://itunes.apple.com/cn/app/%E6%97%B6%E9%97%B4%E8%A7%84%E5%88%92%E5%B1%80-%E6%8F%90%E9%86%92%E4%BD%A0%E7%8F%8D%E6%83%9C%E6%97%B6%E9%97%B4%E7%9A%84-widget/id1204689405?mt=8" target="_blank" rel="noopener"
 >时间规划局&lt;/a>&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/c-%E8%AE%A1%E7%AE%97%E4%BB%8A%E5%B9%B4%E8%BF%87%E5%8E%BB%E6%97%B6%E9%97%B4%E7%99%BE%E5%88%86%E6%AF%94/20181015165211.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/cpp-year-percent/20181015165211.png"
 width="697"
 height="286"
-srcset="https://reionwong.github.io/p/c-%E8%AE%A1%E7%AE%97%E4%BB%8A%E5%B9%B4%E8%BF%87%E5%8E%BB%E6%97%B6%E9%97%B4%E7%99%BE%E5%88%86%E6%AF%94/20181015165211_huef86bfa02a6ffa257e6b04b735469039_46107_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/c-%E8%AE%A1%E7%AE%97%E4%BB%8A%E5%B9%B4%E8%BF%87%E5%8E%BB%E6%97%B6%E9%97%B4%E7%99%BE%E5%88%86%E6%AF%94/20181015165211_huef86bfa02a6ffa257e6b04b735469039_46107_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/cpp-year-percent/20181015165211_huef86bfa02a6ffa257e6b04b735469039_46107_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cpp-year-percent/20181015165211_huef86bfa02a6ffa257e6b04b735469039_46107_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="243"
@@ -1761,7 +1869,7 @@ data-flex-basis="584px"
 &lt;/div>
 &lt;/div>&lt;h2 id="最后">最后&lt;/h2>
 &lt;p>两个 long 类型的值相除时，结果会自动取整，可以在被除数乘以 1.0 再除以除数，这样得到的结果就不会取整为零了。&lt;/p>
-&lt;p>当然也可以强转为 double 类型，不过不推荐这样的做法。&lt;/p></description></item><item><title>QPlainTextEdit 文本光标绘制</title><link>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</link><pubDate>Thu, 11 Oct 2018 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qplaintextedit-%E6%96%87%E6%9C%AC%E5%85%89%E6%A0%87%E7%BB%98%E5%88%B6/</guid><description>&lt;p>发现在 Linux 下是没办法修改光标的颜色，在 Google、Qt 论坛搜索了一遍，还是解决不了。&lt;/p>
+&lt;p>当然也可以强转为 double 类型，不过不推荐这样的做法。&lt;/p></description></item><item><title>QPlainTextEdit 文本光标绘制</title><link>https://reionwong.github.io/p/qplaintextedit-cursor-color/</link><pubDate>Thu, 11 Oct 2018 14:00:06 +0800</pubDate><guid>https://reionwong.github.io/p/qplaintextedit-cursor-color/</guid><description>&lt;p>发现在 Linux 下是没办法修改光标的颜色，在 Google、Qt 论坛搜索了一遍，还是解决不了。&lt;/p>
 &lt;p>今天看了一下 QPlainTextEdit 的 API 发现有 cursorRect() 这个函数，它返回光标所在的位置，突然灵感就来了，把 cursor 宽度设置为0，相当于把它给隐藏了，然后可以通过重写 paintEvent() 函数，在 viewport() 里绘制光标矩形，可以根据你想要的颜色来进行绘制。&lt;/p>
 &lt;h2 id="头文件">头文件&lt;/h2>
 &lt;div class="highlight">&lt;div class="chroma">
@@ -1922,25 +2030,25 @@ data-flex-basis="584px"
 &lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">m_cursorVisible = !m_cursorVisible
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
-&lt;/div>&lt;p>关于闪烁还有一些交互，比如在文本改变的时候不进行闪烁、光标移动的时候也不进行闪烁&amp;hellip;&lt;/p></description></item><item><title>DDE 通知服务技术细节原理</title><link>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</link><pubDate>Mon, 08 Oct 2018 23:19:46 +0800</pubDate><guid>https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/</guid><description>&lt;p>搬了一篇今年 4 月份写的文章，现在的 deepin-notifications 已经合并到 &lt;a class="link" href="https://github.com/linuxdeepin/dde-session-ui" target="_blank" rel="noopener"
+&lt;/div>&lt;p>关于闪烁还有一些交互，比如在文本改变的时候不进行闪烁、光标移动的时候也不进行闪烁&amp;hellip;&lt;/p></description></item><item><title>DDE 通知服务技术细节原理</title><link>https://reionwong.github.io/p/dde-notifications/</link><pubDate>Mon, 08 Oct 2018 23:19:46 +0800</pubDate><guid>https://reionwong.github.io/p/dde-notifications/</guid><description>&lt;p>搬了一篇今年 4 月份写的文章，现在的 deepin-notifications 已经合并到 &lt;a class="link" href="https://github.com/linuxdeepin/dde-session-ui" target="_blank" rel="noopener"
 >dde-session-ui&lt;/a> 这个项目中了。&lt;/p>
 &lt;p>deepin-notifications 提供桌面通知服务，当有新的消息通知时就会在系统的右上角弹出消息通知对话框，按照 Deepin UI 设计规范做的，遵循了 freedesktop 标准来实现。&lt;/p>
 &lt;p>libnotify 是一个按照 &lt;a class="link" href="https://people.gnome.org/~mccann/docs/notification-spec/notification-spec-latest.html" target="_blank" rel="noopener"
 >Desktop Notifications Specification&lt;/a> (桌面通知规范) 实现的一个库，向通知守护进程发送桌面通知的函数库。这些通知可以用于通知用户一个事件或者显示某些形式的信息，而不用妨碍用户的操作，以异步的方式通知用户事件，并提供了一个 DBus 接口。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639.png"
 width="300"
 height="70"
-srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-notifications/deepin_screenshot__20180401120639_hua85ad02ef9bd08c6b1f3bcf723a8eb41_8044_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="428"
 data-flex-basis="1028px"
 >&lt;/p>
 &lt;h2 id="架构设计">架构设计&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dde-notifications/deepin_notifications.png"
 width="890"
 height="533"
-srcset="https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-%E9%80%9A%E7%9F%A5%E6%9C%8D%E5%8A%A1%E6%8A%80%E6%9C%AF%E7%BB%86%E8%8A%82%E5%8E%9F%E7%90%86/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dde-notifications/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dde-notifications/deepin_notifications_hu407eb2b755f488a7ec697b8c7e7246e0_52178_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="166"
@@ -1995,7 +2103,7 @@ data-flex-basis="400px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;h2 id="最后">最后&lt;/h2>
-&lt;p>其实这个也没啥好写的，主要就是连接相关 DBus 接口，当接受到新消息时就做出处理，好了编不下去…&lt;/p></description></item><item><title>C++ 标准库文件操作</title><link>https://reionwong.github.io/p/c-%E6%A0%87%E5%87%86%E5%BA%93%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</link><pubDate>Sat, 06 Oct 2018 12:38:33 +0800</pubDate><guid>https://reionwong.github.io/p/c-%E6%A0%87%E5%87%86%E5%BA%93%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</guid><description>&lt;p>在编程中，对一些文件读写操作是很有必要的；最近对 C++ 标准库挺感兴趣的。&lt;/p>
+&lt;p>其实这个也没啥好写的，主要就是连接相关 DBus 接口，当接受到新消息时就做出处理，好了编不下去…&lt;/p></description></item><item><title>C++ 标准库文件操作</title><link>https://reionwong.github.io/p/cpp-std-file-operation/</link><pubDate>Sat, 06 Oct 2018 12:38:33 +0800</pubDate><guid>https://reionwong.github.io/p/cpp-std-file-operation/</guid><description>&lt;p>在编程中，对一些文件读写操作是很有必要的；最近对 C++ 标准库挺感兴趣的。&lt;/p>
 &lt;h2 id="文件流操作">文件流操作&lt;/h2>
 &lt;p>在标准库中可以通过 &lt;code>fstream&lt;/code> 来进行文件读写操作，包含了常用的文件操作，在 C++ 所有文件操作都是以 &lt;strong>流(stream)&lt;/strong> 的方式进行的，fstream 也就是 &lt;strong>文件流(file stream)&lt;/strong> 的意思；计算机并不区分二进制文件和文本文件，所有文件都是以二进制形式存储。&lt;/p>
 &lt;p>&lt;code>fstream&lt;/code> 子类是通过 &lt;code>stream&lt;/code> 来实现的，毫无疑问，&lt;code>ofstream&lt;/code>、&lt;code>ifstream&lt;/code> 的意思分别是输出文件流和输入文件流。&lt;/p>
@@ -2196,11 +2304,11 @@ data-flex-basis="400px"
 &lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
 &lt;/div>
 &lt;/div>&lt;h2 id="最后">最后&lt;/h2>
-&lt;p>感觉还是没有 Qt 封装的 QFile 好用，可以封装一下 fstream 做一个和 QFile 差不多好用的类，哈哈哈。&lt;/p></description></item><item><title>Deepin Editor 1.0 开发总结</title><link>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</link><pubDate>Sat, 06 Oct 2018 02:21:03 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/</guid><description>&lt;p>前段时间把编辑器这个项目给接了过来，锻炼一下自己、练练手，经历了各种修修补补、增增删删的环节，刚看了一下 github，发现到如今我提交的 commit 也有 200+ 了&amp;hellip;&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134.png"
+&lt;p>感觉还是没有 Qt 封装的 QFile 好用，可以封装一下 fstream 做一个和 QFile 差不多好用的类，哈哈哈。&lt;/p></description></item><item><title>Deepin Editor 1.0 开发总结</title><link>https://reionwong.github.io/p/dedit-1-0-summary/</link><pubDate>Sat, 06 Oct 2018 02:21:03 +0800</pubDate><guid>https://reionwong.github.io/p/dedit-1-0-summary/</guid><description>&lt;p>前段时间把编辑器这个项目给接了过来，锻炼一下自己、练练手，经历了各种修修补补、增增删删的环节，刚看了一下 github，发现到如今我提交的 commit 也有 200+ 了&amp;hellip;&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134.png"
 width="947"
 height="517"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-3e18a9c5217a1134_hu15fcd06dbe340c3fb2e568af1287c7c0_73024_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="深度截图_选择区域_20181005232607.png"
 class="gallery-image"
@@ -2210,10 +2318,10 @@ data-flex-basis="439px"
 &lt;h2 id="介绍">介绍&lt;/h2>
 &lt;p>Deepin 为什么喜欢造轮子？主要是为了达到深度操作系统 &lt;strong>用户界面 / 用户体验&lt;/strong> 大统一的目标，今年的最主要目标不是造轮子，而是往系统稳定性的方向发展，所以造轮子是副业；虽然目前深度编辑器在技术方面还秒杀不了 KDE 家的 kate 编辑器，这个后面会讲到，但是在 UI/UX 这方面我觉得可以秒杀它们。&lt;/p>
 &lt;p>深度编辑器定位就是简单易用、轻量级的编辑器，目标就是要替换 gedit，保持深度编辑器的 UI/UX 和深度家族整体设计语言保持一致，比如我最近一直在写博客，很多文章就是通过深度编辑器来写的；论坛里边很多用户说很少用到编辑器，也就偶尔修改配置文件和 TXT 文件的时候会用到，属于轻度使用；在编程写代码这方面环境来看，都有专属的 IDE (集成开发环境)，所以用记事本来写代码的很少吧。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/dedit1.png"
 width="1026"
 height="619"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/dedit1_hu756c1f7b2de6a4b1bfa102999aadd88a_95337_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="主界面"
 class="gallery-image"
@@ -2222,10 +2330,10 @@ data-flex-basis="397px"
 >&lt;/p>
 &lt;p>顶部采用类似 Chrome 的标签栏设计，整体超窄边框显示，界面像深度终端那样简洁，不显示多余的东西，写作的沉浸感，带来了一种沉浸式的编辑体验。&lt;/p>
 &lt;p>多标签页设计支持将标签拖拽成窗口，或者将两个窗口拖拽到一个窗口里的另一个标签页。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu.png"
 width="189"
 height="436"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/dedit-rightmenu_hu3fb0fc045084f02526b8469fd414f1cc_42203_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="右键智能菜单"
 class="gallery-image"
@@ -2246,10 +2354,10 @@ data-flex-basis="104px"
 &lt;h3 id="窗口管理">窗口管理&lt;/h3>
 &lt;p>既然是单进程多窗口模式，就不能在 main.cpp 里管理窗口创建/销毁了，保持 main 文件的代码简介，所以就诞生了 StartManager 类，所有窗口创建都在这个类里边进行管理，同时把创建过的窗口指针保存在一个 QList 里。&lt;/p>
 &lt;h3 id="窗口布局">窗口布局&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852.png"
 width="1240"
 height="659"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-7bc4348d19372852_huf433e8ec03e652de028ff0cf736dda25_40671_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="前端布局"
 class="gallery-image"
@@ -2266,10 +2374,10 @@ data-flex-basis="451px"
 &lt;/ul>
 &lt;p>EditWrapper 其实主要就是封装了左侧的行号控件 + Qt 编辑框控件 QPlainTextEdit，在 EditWrapper 类里做了 openFile()、saveFile() 相关操作，也就是在这个类做了打开文件、保存文件的代码，Window 类会调用到此相关的函数。&lt;/p>
 &lt;h3 id="主题模块">主题模块&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e.png"
 width="233"
 height="256"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-eeb7b9131552af0e_hu5adbc7e1a9642ff1842f46422177fbe8_23384_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="Model View 概览"
 class="gallery-image"
@@ -2286,10 +2394,10 @@ data-flex-basis="218px"
 >KTextEditor&lt;/a> 了，那就先放一下了，这个时候想起了老王说的那句话：“很多时候技术上遇到瓶颈，千万不要放弃，先暂时放一下，灵感会随着你长时间的深入思考突然蹦出来的。”&lt;/p>
 &lt;p>至于为什么不用 &lt;a class="link" href="https://api.kde.org/frameworks/ktexteditor/html/" target="_blank" rel="noopener"
 >KTextEditor&lt;/a> ，这些依赖都不是盖的，哈哈哈。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a.png"
 width="1240"
 height="563"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-d7acdbe7f525d34a_hu4a898587abbc9e6f219a1a646789f955_239910_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="KTextEditor 依赖网"
 class="gallery-image"
@@ -2299,10 +2407,10 @@ data-flex-basis="528px"
 &lt;h2 id="高亮实现">高亮实现&lt;/h2>
 &lt;p>关于 Qt 语法高亮，Qt 官方文档有个很好的例子：&lt;a class="link" href="http://doc.qt.io/qt-5/qtwidgets-richtext-syntaxhighlighter-example.html" target="_blank" rel="noopener"
 >Syntax Highlighter Example&lt;/a>，QSyntaxHighlighter 允许自定义高亮规则，但是需要配合 QPlainTextEdit 来使用，如果未来自己实现一个编辑器控件的话，这个也是个问题。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955.png"
 width="213"
 height="132"
-srcset="https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-editor-1.0-%E5%BC%80%E5%8F%91%E6%80%BB%E7%BB%93/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/dedit-1-0-summary/4456831-3600884a295f9955_huee5a0f8af879f0482fca41bbd1daf47c_4447_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="KSyntaxHighlighting 依赖网"
 class="gallery-image"
@@ -2315,7 +2423,7 @@ data-flex-basis="387px"
 &lt;h2 id="polkit-提权实现">Polkit 提权实现&lt;/h2>
 &lt;p>待写。&lt;/p>
 &lt;h2 id="最后">最后&lt;/h2>
-&lt;p>之前一位社区开发者 @sonichy 问我：右键打开文件的时候是怎么实现在标签页中打开呢？我大概知道是什么意思了，最近没有时间回复，在这里可以回答一下。双击打开文件的时候文件管理器会调用对应的软件，并且会加上当前打开的文件地址字符串作为参数传进来编辑器，然后使用 QDBusInterface 作为远程对象接口代理，通过 callWithArgumentList() 调用远程接口，这样就实现了不打开新窗口。&lt;/p></description></item><item><title>深度文件管理器文件拷贝原理</title><link>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>https://reionwong.github.io/p/%E6%B7%B1%E5%BA%A6%E6%96%87%E4%BB%B6%E7%AE%A1%E7%90%86%E5%99%A8%E6%96%87%E4%BB%B6%E6%8B%B7%E8%B4%9D%E5%8E%9F%E7%90%86/</guid><description>&lt;p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。&lt;/p>
+&lt;p>之前一位社区开发者 @sonichy 问我：右键打开文件的时候是怎么实现在标签页中打开呢？我大概知道是什么意思了，最近没有时间回复，在这里可以回答一下。双击打开文件的时候文件管理器会调用对应的软件，并且会加上当前打开的文件地址字符串作为参数传进来编辑器，然后使用 QDBusInterface 作为远程对象接口代理，通过 callWithArgumentList() 调用远程接口，这样就实现了不打开新窗口。&lt;/p></description></item><item><title>深度文件管理器文件拷贝原理</title><link>https://reionwong.github.io/p/dde-filemanager-cp/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>https://reionwong.github.io/p/dde-filemanager-cp/</guid><description>&lt;p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。&lt;/p>
 &lt;p>大概是这么一个流程：&lt;/p>
 &lt;ul>
 &lt;li>传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir)&lt;/li>
@@ -2478,7 +2586,7 @@ data-flex-basis="387px"
 >Linux 中的零拷贝技术 splice&lt;/a>&lt;/p>
 &lt;h2 id="最后">最后&lt;/h2>
 &lt;p>具体代码实现请看：&lt;a class="link" href="https://github.com/linuxdeepin/dde-file-manager/blob/e8bd4a23647eee871ad1caf8c10c465be2dbd6e7/fileoperations/filejob.cpp#L833" target="_blank" rel="noopener"
->filejob.cpp&lt;/a>&lt;/p></description></item><item><title>D-Bus 基础</title><link>https://reionwong.github.io/p/d-bus-%E5%9F%BA%E7%A1%80/</link><pubDate>Sat, 29 Sep 2018 15:52:40 +0800</pubDate><guid>https://reionwong.github.io/p/d-bus-%E5%9F%BA%E7%A1%80/</guid><description>&lt;p>D-Bus 是一种高级的进程间通信机制，是 freedesktop.org 的一个项目，为 Linux 桌面环境提供标准，是一个为应用程序间通信的消息总线系统, 主要用于在 Linux 进程之间的通信。&lt;/p>
+>filejob.cpp&lt;/a>&lt;/p></description></item><item><title>D-Bus 基础</title><link>https://reionwong.github.io/p/dbus-basis/</link><pubDate>Sat, 29 Sep 2018 15:52:40 +0800</pubDate><guid>https://reionwong.github.io/p/dbus-basis/</guid><description>&lt;p>D-Bus 是一种高级的进程间通信机制，是 freedesktop.org 的一个项目，为 Linux 桌面环境提供标准，是一个为应用程序间通信的消息总线系统, 主要用于在 Linux 进程之间的通信。&lt;/p>
 &lt;p>D-Bus 有三层架构的进程间的通信：&lt;/p>
 &lt;ul>
 &lt;li>接口层：由函数库 libdbus 提供，进程可通过该库使用 D-Bus&lt;/li>
@@ -2582,7 +2690,7 @@ data-flex-basis="387px"
 >https://thebigdoc.readthedocs.io/en/latest/dbus/dbus.html&lt;/a>&lt;/p>
 &lt;p>D-Bus和 QT4：http://www.cnblogs.com/wwang/archive/2010/10/27/1862552.html&lt;/p>
 &lt;p>开发篇 —— DBus：https://blog.csdn.net/flowingflying/article/details/4527634&lt;/p>
-&lt;p>Gtk DBus基础：http://www.cnblogs.com/wzh206/archive/2010/05/13/1734901.html&lt;/p></description></item><item><title>C++ 模仿 Qt 的 Signal/Slots 机制</title><link>https://reionwong.github.io/p/c-%E6%A8%A1%E4%BB%BF-qt-%E7%9A%84-signal/slots-%E6%9C%BA%E5%88%B6/</link><pubDate>Sat, 29 Sep 2018 11:31:29 +0800</pubDate><guid>https://reionwong.github.io/p/c-%E6%A8%A1%E4%BB%BF-qt-%E7%9A%84-signal/slots-%E6%9C%BA%E5%88%B6/</guid><description>&lt;p>作为用了一年 Qt 的 Qter，如今还是个菜比，对 Qt 的 signals/slots 机制及其喜欢，它是应用于对象间的通信，也是 Qt 的核心机制。&lt;/p>
+&lt;p>Gtk DBus基础：http://www.cnblogs.com/wzh206/archive/2010/05/13/1734901.html&lt;/p></description></item><item><title>C++ 模仿 Qt 的 Signal/Slots 机制</title><link>https://reionwong.github.io/p/singals-slots-in-cpp/</link><pubDate>Sat, 29 Sep 2018 11:31:29 +0800</pubDate><guid>https://reionwong.github.io/p/singals-slots-in-cpp/</guid><description>&lt;p>作为用了一年 Qt 的 Qter，如今还是个菜比，对 Qt 的 signals/slots 机制及其喜欢，它是应用于对象间的通信，也是 Qt 的核心机制。&lt;/p>
 &lt;p>像很多库都提供了这种模式，比如 boost、&lt;a class="link" href="https://vdksoft.github.io/signals/index.html" target="_blank" rel="noopener"
 >vdk-signals&lt;/a>&amp;hellip;为什么还要实现一个，因为没有更多的依赖，也可以更了解实现原理。&lt;/p>
 &lt;h2 id="模板类">模板类&lt;/h2>
@@ -2793,7 +2901,7 @@ data-flex-basis="387px"
 &lt;/div>
 &lt;/div>&lt;h2 id="参考资料">参考资料&lt;/h2>
 &lt;p>&lt;a class="link" href="https://zh.wikipedia.org/wiki/%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F" target="_blank" rel="noopener"
->观察者模式(维基百科)&lt;/a>&lt;/p></description></item><item><title>管理 Linux 最近文件列表</title><link>https://reionwong.github.io/p/%E7%AE%A1%E7%90%86-linux-%E6%9C%80%E8%BF%91%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</link><pubDate>Sat, 29 Sep 2018 11:31:29 +0800</pubDate><guid>https://reionwong.github.io/p/%E7%AE%A1%E7%90%86-linux-%E6%9C%80%E8%BF%91%E6%96%87%E4%BB%B6%E5%88%97%E8%A1%A8/</guid><description>&lt;p>freedesktop 定制了最近的文件存储规范 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
+>观察者模式(维基百科)&lt;/a>&lt;/p></description></item><item><title>管理 Linux 最近文件列表</title><link>https://reionwong.github.io/p/linux-recent-manager/</link><pubDate>Sat, 29 Sep 2018 11:31:29 +0800</pubDate><guid>https://reionwong.github.io/p/linux-recent-manager/</guid><description>&lt;p>freedesktop 定制了最近的文件存储规范 &lt;a class="link" href="https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html" target="_blank" rel="noopener"
 >recent-file-spec&lt;/a>，为 X 桌面提供统一的标准，它存储在 &lt;code>~/.local/share/recently-used.xbel&lt;/code> 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 &lt;a class="link" href="https://savannah.nongnu.org/projects/fam/" target="_blank" rel="noopener"
 >FAM&lt;/a> 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。&lt;/p>
 &lt;h2 id="基本格式">基本格式&lt;/h2>
@@ -3102,12 +3210,12 @@ data-flex-basis="387px"
 &lt;/div>
 &lt;/div>&lt;h2 id="相关链接">相关链接&lt;/h2>
 &lt;p>&lt;a class="link" href="https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/" target="_blank" rel="noopener"
->https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
+>https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec&lt;/a>&lt;/p></description></item><item><title>Deepin Font Installer 技术原理</title><link>https://reionwong.github.io/p/deepin-font-installer/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>https://reionwong.github.io/p/deepin-font-installer/</guid><description>&lt;p>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。&lt;/p>
 &lt;h2 id="架构设计">架构设计&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/tech.png"
 width="646"
 height="503"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/tech_hu62c8310c697a9ea1bd7aedbff9ada3e8_28492_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="架构设计图.png"
 class="gallery-image"
@@ -3132,10 +3240,10 @@ data-flex-basis="308px"
 &lt;li>预览控件实现&lt;/li>
 &lt;/ul>
 &lt;h2 id="前端界面实现">前端界面实现&lt;/h2>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202.png"
 width="520"
 height="440"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/deepin_20180310184202_hu744e91e53a603e326c9bb663a3627cea_39960_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="deepin_20180310184202.png"
 class="gallery-image"
@@ -3355,10 +3463,10 @@ data-flex-basis="283px"
 &lt;p>参考：&lt;a class="link" href="https://www.freedesktop.org/software/polkit/docs/latest/polkit.8.html" target="_blank" rel="noopener"
 >freedesktop官方文档&lt;/a>&lt;/p>
 &lt;h3 id="字体预览控件">字体预览控件&lt;/h3>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47.png"
 width="1280"
 height="762"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/5c5505c2f28aaa47_huc53af903280e84ee494dccaa7806e634_97811_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="预览效果图.png"
 class="gallery-image"
@@ -3368,10 +3476,10 @@ data-flex-basis="403px"
 &lt;p>控件基于 QWidget，传入一个字体文件路径，然后载入该字体（使用 QFontDatabase 类），重载 paintEvent 事件绘画预览内容，整个窗口大小为屏幕大小 ÷ 1.5。&lt;/p>
 &lt;h4 id="获取预览内容">获取预览内容&lt;/h4>
 &lt;p>加载所有语言的示例文本内容，检查打开的字体是否支持当前系统语言的预览内容显示（使用 freetype 库），如果不支持就判断英文的预览内容，还是不支持的话自动生成一串 unicode 进行预览（例如图标字体，由 freetype 生成）；字号由小到大，一到三行为固定字符串；三行以下为预览内容。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE.png"
 width="573"
 height="710"
-srcset="https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer-%E6%8A%80%E6%9C%AF%E5%8E%9F%E7%90%86/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/deepin-font-installer/%E8%8E%B7%E5%8F%96%E9%A2%84%E8%A7%88%E5%86%85%E5%AE%B9%E6%B5%81%E7%A8%8B%E5%9B%BE_huf5fafe8275e92bb2409560990be3ea32_33536_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 alt="获取预览内容流程图.png"
 class="gallery-image"

@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on Reion's Blog</title><link>https://reionwong.github.io/categories/security/</link><description>Recent content in Security on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 13 Aug 2019 18:04:56 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/security/index.xml" rel="self" type="application/rss+xml"/><item><title>什么是 PGP 加密以及它如何工作？</title><link>https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/</link><pubDate>Tue, 13 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/</guid><description>&lt;p>当你使用 ProtonMail 发送加密电子邮件时，你的信息将会使用 PGP 加密进行保护。关于什么是 PGP，本文解释了我们安全承诺背后的技术。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM.jpg"
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Security on Reion's Blog</title><link>https://reionwong.github.io/categories/security/</link><description>Recent content in Security on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Tue, 13 Aug 2019 18:04:56 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/security/index.xml" rel="self" type="application/rss+xml"/><item><title>什么是 PGP 加密以及它如何工作？</title><link>https://reionwong.github.io/p/what-is-pgp-encryption/</link><pubDate>Tue, 13 Aug 2019 18:04:56 +0800</pubDate><guid>https://reionwong.github.io/p/what-is-pgp-encryption/</guid><description>&lt;p>当你使用 ProtonMail 发送加密电子邮件时，你的信息将会使用 PGP 加密进行保护。关于什么是 PGP，本文解释了我们安全承诺背后的技术。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM.jpg"
 width="1024"
 height="512"
-srcset="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_480x0_resize_q75_box.jpg 480w, https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_1024x0_resize_q75_box.jpg 1024w"
+srcset="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_480x0_resize_q75_box.jpg 480w, https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-IM_huc3a83ac61eb49e2ac4e763e874fb50da_170909_1024x0_resize_q75_box.jpg 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="200"
@@ -21,10 +21,10 @@ data-flex-basis="480px"
 &lt;p>从历史上看，PGP 很难使用，需要在电子邮件提供商或客户端的基础之上增加额外的应用程序。你还必须手动生成加密密钥并与联系人交换密钥。使用 ProtonMail，PGP 是内置的，并且自动运行且无形的。当你使用另一个 ProtonMail 用户编写电子邮件并发送时，邮件加密和签名将自动进行。你无需做任何事情或需要任何专业技术知识。ProtonMail 使 PGP 加密变得更简单、方便。&lt;/p>
 &lt;h2 id="pgp-如何运作">PGP 如何运作？&lt;/h2>
 &lt;p>查看这张图来理解 PGP 加密是如何工作是非常有用的，PGP 使用对称密钥加密（即一次性会话密钥加密和解密消息）和公共密钥加密（即接收者独有的密钥加密和解密会话密钥）的组合。&lt;/p>
-&lt;p>&lt;img src="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM.png"
+&lt;p>&lt;img src="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM.png"
 width="1220"
 height="610"
-srcset="https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/%E4%BB%80%E4%B9%88%E6%98%AF-pgp-%E5%8A%A0%E5%AF%86%E4%BB%A5%E5%8F%8A%E5%AE%83%E5%A6%82%E4%BD%95%E5%B7%A5%E4%BD%9C/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_1024x0_resize_box_3.png 1024w"
+srcset="https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/what-is-pgp-encryption/ProtonMail-How-does-pgp-work-graphic-IM_hufa1bc436aa55c254fac8200c5f299a96_39054_1024x0_resize_box_3.png 1024w"
 loading="lazy"
 class="gallery-image"
 data-flex-grow="200"
@@ -63,7 +63,7 @@ data-flex-basis="480px"
 &lt;p>随着超级计算机变得更快，新的加密标准越来越受欢迎，ProtonMail 将继续适应新的网络威胁和用户的需求。我们的密码学家正在努力开展新项目，如关键透明度和源代码透明度。我们最近还将用户升级为&lt;a class="link" href="https://protonmail.com/blog/elliptic-curve-cryptography/" target="_blank" rel="noopener"
 >椭圆曲线加密&lt;/a>，从而最大限度地提高了安全性和效率。 在我们社区的支持下，我们正在经过时间考验的基础上建立一个更安全的互联网。&lt;/p>
 &lt;p>英文原文：&lt;a class="link" href="https://protonmail.com/blog/what-is-pgp-encryption/" target="_blank" rel="noopener"
->https://protonmail.com/blog/what-is-pgp-encryption/&lt;/a>&lt;/p></description></item><item><title>Github 使用 GPG 签名验证</title><link>https://reionwong.github.io/p/github-%E4%BD%BF%E7%94%A8-gpg-%E7%AD%BE%E5%90%8D%E9%AA%8C%E8%AF%81/</link><pubDate>Sat, 03 Aug 2019 01:35:56 +0800</pubDate><guid>https://reionwong.github.io/p/github-%E4%BD%BF%E7%94%A8-gpg-%E7%AD%BE%E5%90%8D%E9%AA%8C%E8%AF%81/</guid><description>&lt;p>GPG 是一个用于数据加密和数字签名的程序，由于被广泛应用，后来形成了一个开放的标准 OpenPGP，而 GnuPG 是实现了该标准的一个开源程序，在 Linux 下可以使用 GnuPG 来管理密钥、加密解密文件、电子邮件、数字签名文件等内容。&lt;/p>
+>https://protonmail.com/blog/what-is-pgp-encryption/&lt;/a>&lt;/p></description></item><item><title>Github 使用 GPG 签名验证</title><link>https://reionwong.github.io/p/github-using-gpg/</link><pubDate>Sat, 03 Aug 2019 01:35:56 +0800</pubDate><guid>https://reionwong.github.io/p/github-using-gpg/</guid><description>&lt;p>GPG 是一个用于数据加密和数字签名的程序，由于被广泛应用，后来形成了一个开放的标准 OpenPGP，而 GnuPG 是实现了该标准的一个开源程序，在 Linux 下可以使用 GnuPG 来管理密钥、加密解密文件、电子邮件、数字签名文件等内容。&lt;/p>
 &lt;p>在 Linux 下，一般可以在系统软件源中找到 GnuPG，比如 debian 发行版可以通过以下命令安装：&lt;/p>
 &lt;p>&lt;code>$ sudo apt install gnupg&lt;/code>&lt;/p>
 &lt;h2 id="gnupg-简单用法">GnuPG 简单用法&lt;/h2>

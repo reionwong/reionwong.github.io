@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Cutefish on Reion's Blog</title><link>https://reionwong.github.io/categories/cutefish/</link><description>Recent content in Cutefish on Reion's Blog</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Mon, 25 Jul 2022 12:03:28 +0800</lastBuildDate><atom:link href="https://reionwong.github.io/categories/cutefish/index.xml" rel="self" type="application/rss+xml"/><item><title>Cutefish 菜单栏背景颜色识别方案</title><link>https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/</link><pubDate>Mon, 25 Jul 2022 12:03:28 +0800</pubDate><guid>https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/</guid><description>&lt;p>macOS Big Sur 版本中顶部菜单栏引入了一个新特性，就是菜单栏背景颜色与桌面壁纸适应效果，相比之前更加融合。&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image.png"
+width="512"
+height="129"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image_hu192d69efe00b1b5867b33a6a04f1120d_50833_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image_hu192d69efe00b1b5867b33a6a04f1120d_50833_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="396"
+data-flex-basis="952px"
+>&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2.png"
+width="512"
+height="129"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2_hue71b3da5b0aab8c8ed1bc3c9cd24df9d_72859_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/image2_hue71b3da5b0aab8c8ed1bc3c9cd24df9d_72859_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="396"
+data-flex-basis="952px"
+>&lt;/p>
+&lt;p>从实际效果中看不仅仅是将背景透明+模糊，它会根据壁纸图片顶部区域中提取主题颜色。&lt;/p>
+&lt;h2 id="实现方案">实现方案&lt;/h2>
+&lt;h3 id="平均值法">平均值法&lt;/h3>
+&lt;p>将图像数据中所有的 rgb 值加起来，再除以图像的面积，求平均值。&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
+&lt;/span>&lt;span class="lnt"> 2
+&lt;/span>&lt;span class="lnt"> 3
+&lt;/span>&lt;span class="lnt"> 4
+&lt;/span>&lt;span class="lnt"> 5
+&lt;/span>&lt;span class="lnt"> 6
+&lt;/span>&lt;span class="lnt"> 7
+&lt;/span>&lt;span class="lnt"> 8
+&lt;/span>&lt;span class="lnt"> 9
+&lt;/span>&lt;span class="lnt">10
+&lt;/span>&lt;span class="lnt">11
+&lt;/span>&lt;span class="lnt">12
+&lt;/span>&lt;span class="lnt">13
+&lt;/span>&lt;span class="lnt">14
+&lt;/span>&lt;span class="lnt">15
+&lt;/span>&lt;span class="lnt">16
+&lt;/span>&lt;span class="lnt">17
+&lt;/span>&lt;span class="lnt">18
+&lt;/span>&lt;span class="lnt">19
+&lt;/span>&lt;span class="lnt">20
+&lt;/span>&lt;span class="lnt">21
+&lt;/span>&lt;span class="lnt">22
+&lt;/span>&lt;span class="lnt">23
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="n">QImage&lt;/span> &lt;span class="nf">img&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;fileName&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QSize&lt;/span> &lt;span class="n">size&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">img&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">size&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kt">long&lt;/span> &lt;span class="kt">long&lt;/span> &lt;span class="n">sumR&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumG&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumB&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 面积
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">measureArea&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">width&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// 遍历图片每一个坐标
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">y&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">height&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">QRgb&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="n">line&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">QRgb&lt;/span> &lt;span class="o">*&lt;/span>&lt;span class="p">)&lt;/span>&lt;span class="n">img&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">scanLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">y&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">x&lt;/span> &lt;span class="o">&amp;lt;&lt;/span> &lt;span class="n">size&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">width&lt;/span>&lt;span class="p">();&lt;/span> &lt;span class="o">++&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumR&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qRed&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumG&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qGreen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="n">sumB&lt;/span> &lt;span class="o">+=&lt;/span> &lt;span class="n">qBlue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">line&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">x&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="p">}&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumR&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumG&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">sumB&lt;/span> &lt;span class="o">/=&lt;/span> &lt;span class="n">measureArea&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
+&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="n">QColor&lt;/span> &lt;span class="n">themeColor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">QColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">sumR&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumG&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">sumB&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="字体颜色适应背景方案">字体颜色适应背景方案&lt;/h3>
+&lt;p>公式&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-c++" data-lang="c++">&lt;span class="line">&lt;span class="cl">&lt;span class="p">(&lt;/span>&lt;span class="n">r&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.299&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">g&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.587&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">b&lt;/span> &lt;span class="o">*&lt;/span> &lt;span class="mf">0.114&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">186&lt;/span> &lt;span class="o">?&lt;/span> &lt;span class="s">&amp;#34;black&amp;#34;&lt;/span> &lt;span class="o">:&lt;/span> &lt;span class="s">&amp;#34;white&amp;#34;&lt;/span>
+&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h2 id="效果图">效果图&lt;/h2>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1.png"
+width="2559"
+height="1599"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1_hu461a5379f751aadc85ff6e95de52a521_807934_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d1_hu461a5379f751aadc85ff6e95de52a521_807934_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>&lt;/p>
+&lt;p>&lt;img src="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2.png"
+width="2559"
+height="1599"
+srcset="https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2_huf96758c5b8de123b71b47686dbb77c71_2205882_480x0_resize_box_3.png 480w, https://reionwong.github.io/p/cutefish-statusbar-background-chameleon/d2_huf96758c5b8de123b71b47686dbb77c71_2205882_1024x0_resize_box_3.png 1024w"
+loading="lazy"
+class="gallery-image"
+data-flex-grow="160"
+data-flex-basis="384px"
+>&lt;/p>
+&lt;h2 id="相关代码">相关代码&lt;/h2>
+&lt;p>&lt;a class="link" href="https://github.com/cutefishos/statusbar/commit/081cd78dc20a88a7e50a402d6c40b9047018494c" target="_blank" rel="noopener"
+>https://github.com/cutefishos/statusbar/commit/081cd78dc20a88a7e50a402d6c40b9047018494c&lt;/a>&lt;/p>
+&lt;p>&lt;a class="link" href="https://github.com/cutefishos/statusbar/commit/7aa179e6b2663cafb9749ed3324b673a8a454182" target="_blank" rel="noopener"
+>https://github.com/cutefishos/statusbar/commit/7aa179e6b2663cafb9749ed3324b673a8a454182&lt;/a>&lt;/p></description></item></channel></rss>

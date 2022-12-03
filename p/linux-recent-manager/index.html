@@ -1,0 +1,275 @@
+<!doctype html><html lang=en-us dir=ltr><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta name=description content="freedesktop 定制了最近的文件存储规范 recent-file-spec，为 X 桌面提供统一的标准，它存储在 ~/.local/share/recently-used.xbel 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 FAM 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。
+基本格式 xbel 文件基本格式如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;xbel version=&amp;#34;1.0&amp;#34; xmlns:bookmark=&amp;#34;http://www.freedesktop.org/standards/desktop-bookmarks&amp;#34; xmlns:mime=&amp;#34;http://www.freedesktop.org/standards/shared-mime-info&amp;#34; &amp;gt; &amp;lt;bookmark href=&amp;#34;file:///home/rekols/Desktop/test.txt&amp;#34; added=&amp;#34;2018-11-01T16:32:08Z&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; visited=&amp;#34;2018-11-01T16:32:09Z&amp;#34;&amp;gt; &amp;lt;info&amp;gt; &amp;lt;metadata owner=&amp;#34;http://freedesktop.org&amp;#34;&amp;gt; &amp;lt;mime:mime-type type=&amp;#34;text/plain&amp;#34;/&amp;gt; &amp;lt;bookmark:groups&amp;gt; &amp;lt;bookmark:group&amp;gt;gedit&amp;lt;/bookmark:group&amp;gt; &amp;lt;/bookmark:groups&amp;gt; &amp;lt;bookmark:applications&amp;gt; &amp;lt;bookmark:application name=&amp;#34;gedit&amp;#34; exec=&amp;#34;&amp;amp;apos;gedit %u&amp;amp;apos;&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; count=&amp;#34;4&amp;#34;/&amp;gt; &amp;lt;/bookmark:applications&amp;gt; &amp;lt;/metadata&amp;gt; &amp;lt;/info&amp;gt; &amp;lt;/bookmark&amp;gt; &amp;lt;/xbel&amp;gt; 根元素必须是 xbel，version 为 1."><title>管理 Linux 最近文件列表</title><link rel=canonical href=https://reionwong.github.io/p/linux-recent-manager/><link rel=stylesheet href=/scss/style.min.8191399262444ab68b72a18c97392f5349be20a1615d77445be51e974c144cff.css><meta property="og:title" content="管理 Linux 最近文件列表"><meta property="og:description" content="freedesktop 定制了最近的文件存储规范 recent-file-spec，为 X 桌面提供统一的标准，它存储在 ~/.local/share/recently-used.xbel 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 FAM 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。
+基本格式 xbel 文件基本格式如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;xbel version=&amp;#34;1.0&amp;#34; xmlns:bookmark=&amp;#34;http://www.freedesktop.org/standards/desktop-bookmarks&amp;#34; xmlns:mime=&amp;#34;http://www.freedesktop.org/standards/shared-mime-info&amp;#34; &amp;gt; &amp;lt;bookmark href=&amp;#34;file:///home/rekols/Desktop/test.txt&amp;#34; added=&amp;#34;2018-11-01T16:32:08Z&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; visited=&amp;#34;2018-11-01T16:32:09Z&amp;#34;&amp;gt; &amp;lt;info&amp;gt; &amp;lt;metadata owner=&amp;#34;http://freedesktop.org&amp;#34;&amp;gt; &amp;lt;mime:mime-type type=&amp;#34;text/plain&amp;#34;/&amp;gt; &amp;lt;bookmark:groups&amp;gt; &amp;lt;bookmark:group&amp;gt;gedit&amp;lt;/bookmark:group&amp;gt; &amp;lt;/bookmark:groups&amp;gt; &amp;lt;bookmark:applications&amp;gt; &amp;lt;bookmark:application name=&amp;#34;gedit&amp;#34; exec=&amp;#34;&amp;amp;apos;gedit %u&amp;amp;apos;&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; count=&amp;#34;4&amp;#34;/&amp;gt; &amp;lt;/bookmark:applications&amp;gt; &amp;lt;/metadata&amp;gt; &amp;lt;/info&amp;gt; &amp;lt;/bookmark&amp;gt; &amp;lt;/xbel&amp;gt; 根元素必须是 xbel，version 为 1."><meta property="og:url" content="https://reionwong.github.io/p/linux-recent-manager/"><meta property="og:site_name" content="Reion's Blog"><meta property="og:type" content="article"><meta property="article:section" content="Post"><meta property="article:published_time" content="2018-09-29T11:31:29+08:00"><meta property="article:modified_time" content="2018-09-29T11:31:29+08:00"><meta name=twitter:title content="管理 Linux 最近文件列表"><meta name=twitter:description content="freedesktop 定制了最近的文件存储规范 recent-file-spec，为 X 桌面提供统一的标准，它存储在 ~/.local/share/recently-used.xbel 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 FAM 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。
+基本格式 xbel 文件基本格式如下：
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;xbel version=&amp;#34;1.0&amp;#34; xmlns:bookmark=&amp;#34;http://www.freedesktop.org/standards/desktop-bookmarks&amp;#34; xmlns:mime=&amp;#34;http://www.freedesktop.org/standards/shared-mime-info&amp;#34; &amp;gt; &amp;lt;bookmark href=&amp;#34;file:///home/rekols/Desktop/test.txt&amp;#34; added=&amp;#34;2018-11-01T16:32:08Z&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; visited=&amp;#34;2018-11-01T16:32:09Z&amp;#34;&amp;gt; &amp;lt;info&amp;gt; &amp;lt;metadata owner=&amp;#34;http://freedesktop.org&amp;#34;&amp;gt; &amp;lt;mime:mime-type type=&amp;#34;text/plain&amp;#34;/&amp;gt; &amp;lt;bookmark:groups&amp;gt; &amp;lt;bookmark:group&amp;gt;gedit&amp;lt;/bookmark:group&amp;gt; &amp;lt;/bookmark:groups&amp;gt; &amp;lt;bookmark:applications&amp;gt; &amp;lt;bookmark:application name=&amp;#34;gedit&amp;#34; exec=&amp;#34;&amp;amp;apos;gedit %u&amp;amp;apos;&amp;#34; modified=&amp;#34;2018-11-01T16:32:46Z&amp;#34; count=&amp;#34;4&amp;#34;/&amp;gt; &amp;lt;/bookmark:applications&amp;gt; &amp;lt;/metadata&amp;gt; &amp;lt;/info&amp;gt; &amp;lt;/bookmark&amp;gt; &amp;lt;/xbel&amp;gt; 根元素必须是 xbel，version 为 1."></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label="Toggle Menu">
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/reion_hu13c9059ce56e338c198d17096353ce75_9704_300x0_resize_q75_box.jpg width=300 height=300 class=site-logo loading=lazy alt=Avatar></a></figure><div class=site-meta><h1 class=site-name><a href=/>Reion's Blog</a></h1><h2 class=site-description>Nature I loved, and next to Nature, Art.</h2></div></header><ol class=social-menu><li><a href=https://github.com/reionwong target=_blank title=GitHub rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6.0 00-1.3-3.2 4.2 4.2.0 00-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3.0 00-6.2.0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2.0 00-.1 3.2A4.6 4.6.0 004 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg></a></li><li><a href=https://twitter.com/reionwong target=_blank title=Twitter rel=me><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><polyline points="5 12 3 12 12 3 21 12 19 12"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M9 21v-6a2 2 0 012-2h2a2 2 0 012 2v6"/></svg><span>Home</span></a></li><li><a href=/archives/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><rect x="3" y="4" width="18" height="4" rx="2"/><path d="M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg><span>Archives</span></a></li><li><a href=/search/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="10" cy="10" r="7"/><line x1="21" y1="21" x2="15" y2="15"/></svg><span>Search</span></a></li><li><a href=/about/><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-user" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="7" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg><span>About</span></a></li><div class=menu-bottom-section><li id=dark-mode-toggle><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg><span>Dark Mode</span></li></div></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">Table of contents</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#基本格式>基本格式</a></li><li><a href=#xbel-读取>xbel 读取</a></li><li><a href=#添加文件>添加文件</a></li><li><a href=#移除文件>移除文件</a></li><li><a href=#相关链接>相关链接</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/linux/ style=background-color:#ffd133;color:#2c1d00>Linux</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/p/linux-recent-manager/>管理 Linux 最近文件列表</a></h2></div><footer class=article-time><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg><time class=article-time--published>Sep 29, 2018</time></div><div><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg><time class=article-time--reading>3 minute read</time></div></footer></div></header><section class=article-content><p>freedesktop 定制了最近的文件存储规范 <a class=link href=https://specifications.freedesktop.org/recent-file-spec/recent-file-spec-0.2.html target=_blank rel=noopener>recent-file-spec</a>，为 X 桌面提供统一的标准，它存储在 <code>~/.local/share/recently-used.xbel</code> 这个文件里，使用 UTF-8 编码，按照 XBEL 格式来存储，所谓 XBEL 就是书签标记语言(XML Bookmark Exchange Language)，是一个 XML 扩展的格式，用于表示书签和其他类似 Web 链接集合的格式；对于管理方法就是像 <a class=link href=https://savannah.nongnu.org/projects/fam/ target=_blank rel=noopener>FAM</a> 那样的机制监控文件的变化，当有变化时做出相应的动作，比如文件被移除就在 GUI 上进行移除的操作，GUI 上提供移除的操作，当移除时就会在 xbel 删除对应的元素，然后改变 xbel 文件内容。</p><h2 id=基本格式>基本格式</h2><p>xbel 文件基本格式如下：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-xml data-lang=xml><span class=line><span class=cl><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;UTF-8&#34;?&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;xbel</span> <span class=na>version=</span><span class=s>&#34;1.0&#34;</span>
+</span></span><span class=line><span class=cl>      <span class=na>xmlns:bookmark=</span><span class=s>&#34;http://www.freedesktop.org/standards/desktop-bookmarks&#34;</span>
+</span></span><span class=line><span class=cl>      <span class=na>xmlns:mime=</span><span class=s>&#34;http://www.freedesktop.org/standards/shared-mime-info&#34;</span>
+</span></span><span class=line><span class=cl><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;bookmark</span> <span class=na>href=</span><span class=s>&#34;file:///home/rekols/Desktop/test.txt&#34;</span> <span class=na>added=</span><span class=s>&#34;2018-11-01T16:32:08Z&#34;</span> <span class=na>modified=</span><span class=s>&#34;2018-11-01T16:32:46Z&#34;</span> <span class=na>visited=</span><span class=s>&#34;2018-11-01T16:32:09Z&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;info&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;metadata</span> <span class=na>owner=</span><span class=s>&#34;http://freedesktop.org&#34;</span><span class=nt>&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&lt;mime:mime-type</span> <span class=na>type=</span><span class=s>&#34;text/plain&#34;</span><span class=nt>/&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&lt;bookmark:groups&gt;</span>
+</span></span><span class=line><span class=cl>          <span class=nt>&lt;bookmark:group&gt;</span>gedit<span class=nt>&lt;/bookmark:group&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&lt;/bookmark:groups&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&lt;bookmark:applications&gt;</span>
+</span></span><span class=line><span class=cl>          <span class=nt>&lt;bookmark:application</span> <span class=na>name=</span><span class=s>&#34;gedit&#34;</span> <span class=na>exec=</span><span class=s>&#34;&amp;apos;gedit %u&amp;apos;&#34;</span> <span class=na>modified=</span><span class=s>&#34;2018-11-01T16:32:46Z&#34;</span> <span class=na>count=</span><span class=s>&#34;4&#34;</span><span class=nt>/&gt;</span>
+</span></span><span class=line><span class=cl>        <span class=nt>&lt;/bookmark:applications&gt;</span>
+</span></span><span class=line><span class=cl>      <span class=nt>&lt;/metadata&gt;</span>
+</span></span><span class=line><span class=cl>    <span class=nt>&lt;/info&gt;</span>
+</span></span><span class=line><span class=cl>  <span class=nt>&lt;/bookmark&gt;</span>
+</span></span><span class=line><span class=cl><span class=nt>&lt;/xbel&gt;</span>
+</span></span></code></pre></td></tr></table></div></div><p>根元素必须是 xbel，version 为 1.0，其他属性可以忽略；</p><p>每个书签都必须以 bookmark 元素为节点，书签的 URI 必须存储在 href 属性中；每个 bookmark元素 都应该有 added、modified、visited 属性，并且以 <a class=link href=http://www.w3.org/TR/NOTE-datetime target=_blank rel=noopener>ISO 8601</a> 为规范的字符串，必须以 UTC 编码，所以读取的时候需要把 UTC 转换为本地时钟才是正确的。</p><p>每个 metadata 元素可以按照以下元素顺序任意组合：</p><ul><li>mime-type 是强制性的，必须包含 URI 指向目标的 MIME Type。</li><li>groups 元素包含一个 group 元素列表，每个元素包含一个组名，groups 元素不是必要的。</li><li>applications 元素包含一个 application 元素列表，指的是该 URI 用什么应用程序打开的。</li></ul><p>每个 application 元素都有很多属性，name 属性是应用程序的名称，exec 属性是启动时的命令行，count 是打开的次数，modified 是最后一次打开的时间。</p><h2 id=xbel-读取>xbel 读取</h2><p>在通常情况下我们只关心 XML 元素的读取，所以 Qt 提供了一个快速解析类：QXmlStreamReader，可以从 QIODevice 或原始的 QByteArray 中读取数据，通过循环 readNextStartElement() 获取每一个 bookmark 元素的 href、added、modified 等属性的内容，还可以使用一组方便的函数 isStartElement()、text() 来获取&mldr;</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>QFile</span> <span class=nf>file</span><span class=p>(</span><span class=n>QDir</span><span class=o>::</span><span class=n>homePath</span><span class=p>()</span> <span class=o>+</span> <span class=s>&#34;/.local/share/recently-used.xbel&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=n>file</span><span class=p>.</span><span class=n>open</span><span class=p>(</span><span class=n>QIODevice</span><span class=o>::</span><span class=n>ReadOnly</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>QXmlStreamReader</span> <span class=nf>reader</span><span class=p>(</span><span class=o>&amp;</span><span class=n>file</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>while</span> <span class=p>(</span><span class=o>!</span><span class=n>reader</span><span class=p>.</span><span class=n>atEnd</span><span class=p>())</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>reader</span><span class=p>.</span><span class=n>readNextStartElement</span><span class=p>()</span> <span class=o>||</span>
+</span></span><span class=line><span class=cl>             <span class=n>reader</span><span class=p>.</span><span class=n>name</span><span class=p>()</span> <span class=o>!=</span> <span class=s>&#34;bookmark&#34;</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=k>continue</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>const</span> <span class=n>QStringRef</span> <span class=o>&amp;</span><span class=n>location</span> <span class=o>=</span> <span class=n>reader</span><span class=p>.</span><span class=n>attributes</span><span class=p>().</span><span class=n>value</span><span class=p>(</span><span class=s>&#34;href&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=k>const</span> <span class=n>QStringRef</span> <span class=o>&amp;</span><span class=n>added</span> <span class=o>=</span> <span class=n>reader</span><span class=p>.</span><span class=n>attributes</span><span class=p>().</span><span class=n>value</span><span class=p>(</span><span class=s>&#34;added&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>location</span><span class=p>.</span><span class=n>isEmpty</span><span class=p>())</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>qDebug</span><span class=p>()</span> <span class=o>&lt;&lt;</span> <span class=s>&#34;文件链接: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>location</span><span class=p>.</span><span class=n>toString</span><span class=p>()</span> 
+</span></span><span class=line><span class=cl>                     <span class=o>&lt;&lt;</span> <span class=s>&#34;加入时间: &#34;</span> <span class=o>&lt;&lt;</span> <span class=n>added</span><span class=p>.</span><span class=n>toString</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p>调用 reader 的 attributes() 获得所有属性，然后对返回的对象使用 value() 即可拿到属性的内容。</p><h2 id=添加文件>添加文件</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span><span class=lnt>33
+</span><span class=lnt>34
+</span><span class=lnt>35
+</span><span class=lnt>36
+</span><span class=lnt>37
+</span><span class=lnt>38
+</span><span class=lnt>39
+</span><span class=lnt>40
+</span><span class=lnt>41
+</span><span class=lnt>42
+</span><span class=lnt>43
+</span><span class=lnt>44
+</span><span class=lnt>45
+</span><span class=lnt>46
+</span><span class=lnt>47
+</span><span class=lnt>48
+</span><span class=lnt>49
+</span><span class=lnt>50
+</span><span class=lnt>51
+</span><span class=lnt>52
+</span><span class=lnt>53
+</span><span class=lnt>54
+</span><span class=lnt>55
+</span><span class=lnt>56
+</span><span class=lnt>57
+</span><span class=lnt>58
+</span><span class=lnt>59
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>QString</span> <span class=n>addedTime</span> <span class=o>=</span> <span class=n>QDateTime</span><span class=o>::</span><span class=n>currentDateTime</span><span class=p>().</span><span class=n>toTimeSpec</span><span class=p>(</span><span class=n>Qt</span><span class=o>::</span><span class=n>OffsetFromUTC</span><span class=p>).</span><span class=n>toString</span><span class=p>(</span><span class=n>Qt</span><span class=o>::</span><span class=n>ISODate</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>QFile</span> <span class=nf>file</span><span class=p>(</span><span class=n>QDir</span><span class=o>::</span><span class=n>homePath</span><span class=p>()</span> <span class=o>+</span> <span class=s>&#34;/.local/share/recently-used.xbel&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>file</span><span class=p>.</span><span class=n>open</span><span class=p>(</span><span class=n>QIODevice</span><span class=o>::</span><span class=n>ReadOnly</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>QDomDocument</span> <span class=n>doc</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>doc</span><span class=p>.</span><span class=n>setContent</span><span class=p>(</span><span class=o>&amp;</span><span class=n>file</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>file</span><span class=p>.</span><span class=n>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=n>file</span><span class=p>.</span><span class=n>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Construct the new element
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>QDomElement</span> <span class=n>bookmarkEl</span><span class=p>,</span> <span class=n>infoEl</span><span class=p>,</span> <span class=n>metadataEl</span><span class=p>,</span> <span class=n>mimeEl</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>createElement</span><span class=p>(</span><span class=s>&#34;bookmark&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;href&#34;</span><span class=p>,</span> <span class=n>fileUrl</span><span class=p>.</span><span class=n>toString</span><span class=p>());</span>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;added&#34;</span><span class=p>,</span> <span class=n>addedTime</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;modified&#34;</span><span class=p>,</span> <span class=n>addedTime</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;visited&#34;</span><span class=p>,</span> <span class=n>addedTime</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>infoEl</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>createElement</span><span class=p>(</span><span class=s>&#34;info&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>metadataEl</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>createElement</span><span class=p>(</span><span class=s>&#34;metadata&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>metadataEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;owner&#34;</span><span class=p>,</span> <span class=s>&#34;http://freedesktop.org&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>mimeEl</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>createElement</span><span class=p>(</span><span class=s>&#34;mime:mime-type&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>mimeEl</span><span class=p>.</span><span class=n>setAttribute</span><span class=p>(</span><span class=s>&#34;type&#34;</span><span class=p>,</span> <span class=n>mimetype</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>metadataEl</span><span class=p>.</span><span class=n>appendChild</span><span class=p>(</span><span class=n>mimeEl</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>infoEl</span><span class=p>.</span><span class=n>appendChild</span><span class=p>(</span><span class=n>metadataEl</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>bookmarkEl</span><span class=p>.</span><span class=n>appendChild</span><span class=p>(</span><span class=n>infoEl</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1>// Remove the existed element and insert the new element we&#39;ve constructed
+</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>QDomElement</span> <span class=n>root</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>documentElement</span><span class=p>();</span>
+</span></span><span class=line><span class=cl><span class=k>auto</span> <span class=n>node_list</span> <span class=o>=</span> <span class=n>root</span><span class=p>.</span><span class=n>elementsByTagName</span><span class=p>(</span><span class=s>&#34;bookmark&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>node_list</span><span class=p>.</span><span class=n>count</span><span class=p>();</span> <span class=n>i</span><span class=o>++</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>const</span> <span class=n>DUrl</span> <span class=n>currentFileUrl</span> <span class=o>=</span> <span class=n>DUrl</span><span class=p>(</span><span class=n>node_list</span><span class=p>.</span><span class=n>at</span><span class=p>(</span><span class=n>i</span><span class=p>).</span><span class=n>toElement</span><span class=p>().</span><span class=n>attribute</span><span class=p>(</span><span class=s>&#34;href&#34;</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=n>currentFileUrl</span> <span class=o>==</span> <span class=n>fileUrl</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>root</span><span class=p>.</span><span class=n>removeChild</span><span class=p>(</span><span class=n>node_list</span><span class=p>.</span><span class=n>at</span><span class=p>(</span><span class=n>i</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>        <span class=n>shouldSendDeleteSignal</span> <span class=o>=</span> <span class=nb>true</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=k>break</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>QDomNode</span> <span class=n>result</span> <span class=o>=</span> <span class=n>root</span><span class=p>.</span><span class=n>appendChild</span><span class=p>(</span><span class=n>bookmarkEl</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=n>result</span><span class=p>.</span><span class=n>isNull</span><span class=p>())</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>file</span><span class=p>.</span><span class=n>open</span><span class=p>(</span><span class=n>QIODevice</span><span class=o>::</span><span class=n>WriteOnly</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=k>return</span><span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>QTextStream</span> <span class=nf>out</span><span class=p>(</span><span class=o>&amp;</span><span class=n>file</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=n>out</span> <span class=o>&lt;&lt;</span> <span class=n>doc</span><span class=p>.</span><span class=n>toString</span><span class=p>();</span>
+</span></span></code></pre></td></tr></table></div></div><p><a class=link href=https://github.com/BLumia target=_blank rel=noopener>@Blumia</a> 同学写的，相关提交：https://cr.deepin.io/#/c/dde/dde-file-manager/+/39540/</p><h2 id=移除文件>移除文件</h2><p>移除文件并不是把原始文件移动到回收站，而是从最近文件中移除，所以就需要在 xbel 文件上移除某个元素，然后保存文件。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span><span class=lnt>30
+</span><span class=lnt>31
+</span><span class=lnt>32
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-c++ data-lang=c++><span class=line><span class=cl><span class=n>QString</span> <span class=n>need_remove_url</span> <span class=o>=</span> <span class=s>&#34;xxxxxxxxxxxxxx&#34;</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>QFile</span> <span class=nf>file</span><span class=p>(</span><span class=n>QDir</span><span class=o>::</span><span class=n>homePath</span><span class=p>()</span> <span class=o>+</span> <span class=s>&#34;/.local/share/recently-used.xbel&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=o>!</span><span class=n>file</span><span class=p>.</span><span class=n>open</span><span class=p>(</span><span class=n>QIODevice</span><span class=o>::</span><span class=n>ReadOnly</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=n>QDomDocument</span> <span class=n>doc</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>    <span class=n>doc</span><span class=p>.</span><span class=n>setContent</span><span class=p>(</span><span class=o>&amp;</span><span class=n>file</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>    <span class=n>file</span><span class=p>.</span><span class=n>close</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 根元素
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>QDomElement</span> <span class=n>root</span> <span class=o>=</span> <span class=n>doc</span><span class=p>.</span><span class=n>documentElement</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=c1>// 返回 root 所有 bookmark 元素列表
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=n>QDomNodeList</span> <span class=n>node_list</span> <span class=o>=</span> <span class=n>root</span><span class=p>.</span><span class=n>elementsByTagName</span><span class=p>(</span><span class=s>&#34;bookmark&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 遍历所有 bookmark 元素，把需要的移除
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>for</span> <span class=p>(</span><span class=kt>int</span> <span class=n>i</span> <span class=o>=</span> <span class=mi>0</span><span class=p>;</span> <span class=n>i</span> <span class=o>&lt;</span> <span class=n>node_list</span><span class=p>.</span><span class=n>count</span><span class=p>();</span> <span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=c1>// 获取 bookmark 中的 URI
+</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>const</span> <span class=n>QString</span> <span class=n>file_url</span> <span class=o>=</span> <span class=n>node_list</span><span class=p>.</span><span class=n>at</span><span class=p>(</span><span class=n>i</span><span class=p>).</span><span class=n>toElement</span><span class=p>().</span><span class=n>attribute</span><span class=p>(</span><span class=s>&#34;href&#34;</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=n>file_url</span> <span class=o>==</span> <span class=n>need_remove_url</span><span class=p>)</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=n>root</span><span class=p>.</span><span class=n>removeChild</span><span class=p>(</span><span class=n>node_list</span><span class=p>.</span><span class=n>at</span><span class=p>(</span><span class=n>i</span><span class=p>));</span>
+</span></span><span class=line><span class=cl>            <span class=n>m_recentNodes</span><span class=p>.</span><span class=n>remove</span><span class=p>(</span><span class=n>file_url</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>            <span class=o>++</span><span class=n>i</span><span class=p>;</span>
+</span></span><span class=line><span class=cl>        <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>    <span class=c1>// 写入文件
+</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=n>file</span><span class=p>.</span><span class=n>open</span><span class=p>(</span><span class=n>QIODevice</span><span class=o>::</span><span class=n>WriteOnly</span><span class=p>))</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=n>QTextStream</span> <span class=nf>out</span><span class=p>(</span><span class=o>&amp;</span><span class=n>file</span><span class=p>);</span>
+</span></span><span class=line><span class=cl>        <span class=n>out</span> <span class=o>&lt;&lt;</span> <span class=n>doc</span><span class=p>.</span><span class=n>toString</span><span class=p>();</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=相关链接>相关链接</h2><p><a class=link href=https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec/ target=_blank rel=noopener>https://www.freedesktop.org/wiki/Specifications/desktop-bookmark-spec</a></p></section><footer class=article-footer><section class=article-copyright><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentcolor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><path d="M14.5 9a3.5 4 0 100 6"/></svg><span>Licensed under CC BY-NC-SA 4.0</span></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>Related content</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/p/kylin-assistant-note/><div class=article-details><h2 class=article-title>kylin-assistant 项目源码阅读笔记</h2></div></a></article><article><a href=/p/dbus-basis/><div class=article-details><h2 class=article-title>D-Bus 基础</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2018 -
+2022 Reion's Blog</section><section class=powerby>Built with <a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a><br>Theme <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.16.0>Stack</a></b> designed by <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a></section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)"></button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.js defer></script>
+<script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
