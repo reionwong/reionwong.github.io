@@ -13,7 +13,7 @@ data-flex-basis="480px"
 >端到端加密&lt;/a>和&lt;a class="link" href="https://protonmail.com/blog/zero-access-encryption/" target="_blank" rel="noopener"
 >零访问加密&lt;/a>。在这里，我们将了解 PGP 是什么，它是如何工作的，以及如何使用它来保护你的通信。&lt;/p>
 &lt;h2 id="什么是-pgp">什么是 PGP？&lt;/h2>
-&lt;p>**PGP 是一种加密方法，可以让我们在线私密交流。**使用 PGP 发送消息时，消息在通过互联网之前会在你的设备上转换为不可读取的密文。收件人只有密钥将密文转换回他们设备上的可读文本。PGP 除了验证发送者的身份，还会验证该消息在传输的过程中有没有被篡改。&lt;/p>
+&lt;p>&lt;strong>PGP 是一种加密方法，可以让我们在线私密交流。&lt;/strong> 使用 PGP 发送消息时，消息在通过互联网之前会在你的设备上转换为不可读取的密文。收件人只有密钥将密文转换回他们设备上的可读文本。PGP 除了验证发送者的身份，还会验证该消息在传输的过程中有没有被篡改。&lt;/p>
 &lt;p>在没有 PGP 之前，你的互联网提供商、电子邮件提供商、黑客或政府理论上可以阅读你的信息。PGP 由 Jon Callas 和 Phil Zimmerman 于 1991 年开发，让电子邮件和其他类型的信息进行私密交流。今天，PGP 已经进行标准化为 OpenPGP，使任何人都可以编写与其他使用兼容和互操作性的 PGP 软件。已经创建了几个符合 OpenPGP 的开发库，以帮助程序员在他们的应用程序中实现 PGP 加密。ProtonMail 是其中这两种库的维护者：&lt;a class="link" href="https://openpgpjs.org" target="_blank" rel="noopener"
 >OpenPGP.js&lt;/a>，针对 JavaScript 编程语言（在我们的 web 应用程序中使用），和 &lt;a class="link" href="https://gopenpgp.org/" target="_blank" rel="noopener"
 >GopenPGP&lt;/a>，针对 Golang 编程语言（在我们的移动端和桌面应用程序中使用）。特别是 OpenPGP.js 是世界上使用最广泛的 OpenPGP 库之一，并且经过安全专家的&lt;a class="link" href="https://protonmail.com/blog/openpgpjs-protonmail-security-audit/" target="_blank" rel="noopener"
@@ -33,13 +33,13 @@ data-flex-basis="480px"
 &lt;p>对于本文，我们坚持高级概念。如果你对加密背后的数学感兴趣，你可以找到稍微简化的&lt;a class="link" href="https://hackernoon.com/public-key-cryptography-simply-explained-e932e3093046" target="_blank" rel="noopener"
 >解释&lt;/a>来消化这些。&lt;/p>
 &lt;h3 id="pgp-加密">PGP 加密&lt;/h3>
-&lt;p>&lt;strong>PGP 做的第一件事就是生成随机会话密钥(random session key)&lt;/strong>。这个密钥是是一个巨大的数字，用于加密和解密消息的内容。只有知道会话密钥的人才能读取消息，而且消息太大无法猜测。会话密钥也不会再用于其他的消息。&lt;/p>
-&lt;p>&lt;strong>接下来，会话密钥使用接收者的公钥加密&lt;/strong>。公钥对于每个人来说都是独一无二的，意味着要共享。由于它没有变化，你的公钥就像一个电子邮件地址。它与你息息相关，任何人都可以用它向你发送加密信息。&lt;/p>
+&lt;p>&lt;strong>PGP 做的第一件事就是生成随机会话密钥(random session key)&lt;/strong> 。这个密钥是是一个巨大的数字，用于加密和解密消息的内容。只有知道会话密钥的人才能读取消息，而且消息太大无法猜测。会话密钥也不会再用于其他的消息。&lt;/p>
+&lt;p>&lt;strong>接下来，会话密钥使用接收者的公钥加密&lt;/strong> 。公钥对于每个人来说都是独一无二的，意味着要共享。由于它没有变化，你的公钥就像一个电子邮件地址。它与你息息相关，任何人都可以用它向你发送加密信息。&lt;/p>
 &lt;p>每个人的公钥对应于他的私钥，这是保密的。&lt;strong>在 PGP 中，当接收者收到加密邮件时，他们使用自己的私钥解密会话密钥。然后明文会话密钥解密该消息。&lt;/strong>&lt;/p>
 &lt;p>你可能想知道为什么 PGP 会采取额外的步骤来加密消息和会话密钥。这是因为公钥加密比对称加密慢得多，尤其对于大消息。使用公钥直接加密和解密大型电子邮件或文件需要花费太多时间和计算能力。但是没有公钥加密的对称加密就不太方便了，因为你需要以某种方式于接收者共享会话密钥。以明文方式这样是不安全的，并且通过另一个加密频道或亲自进行这样做是不切实际。&lt;strong>因此，PGP 结合了对称加密的效率和公钥加密的便利性。&lt;/strong>&lt;/p>
 &lt;h3 id="数字签名">数字签名&lt;/h3>
 &lt;p>PGP 还有两个方面需要注意。首先是&lt;a class="link" href="https://protonmail.com/support/knowledge-base/what-is-a-digital-signature/" target="_blank" rel="noopener"
->数字签名&lt;/a>。**数字签名向接收者证明攻击者没有操纵消息和发送者。**它通过使用发送者私钥和明文消息的数学约简(称为消息摘要)的组合来创建唯一的数字(数字签名)来实现这一点。如果私钥或消息被更改，则数字签名无效。&lt;/p>
+>数字签名&lt;/a>。&lt;strong>数字签名向接收者证明攻击者没有操纵消息和发送者。&lt;/strong> 它通过使用发送者私钥和明文消息的数学约简(称为消息摘要)的组合来创建唯一的数字(数字签名)来实现这一点。如果私钥或消息被更改，则数字签名无效。&lt;/p>
 &lt;h3 id="信任公钥">信任公钥&lt;/h3>
 &lt;p>数字签名有助于减轻复杂的攻击，但是发送者如何知道他们正在使用的公钥是属于他们认为属于的人呢？毕竟，服务器可以轻松地向发送者提供伪造公钥。&lt;/p>
 &lt;p>为了解决这个问题，我们引入了&lt;a class="link" href="https://protonmail.com/blog/address-verification-pgp-support/" target="_blank" rel="noopener"
