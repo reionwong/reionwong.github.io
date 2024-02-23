@@ -1,0 +1,146 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><title>How KDE Plasma Badge Works - Reion's Think</title>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=author content="StaticMania"><meta name=generator content="Hugo 0.123.2"><link rel=stylesheet href=/css/bootstrap.min.css><link rel=stylesheet href=/font-awesome/css/font-awesome.min.css><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700" rel=stylesheet><link href=/scss/style.min.css rel=stylesheet><link rel="shortcut icon" href=/images/logo.svg type=image/x-icon><link rel=icon href=/images/logo.svg type=image/x-icon></head><body><nav class="navbar navbar-expand-lg site-navigation"><div class=container><a class=navbar-brand href=/><img src=/images/logo.svg alt=logo>
+</a><button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span></button><div class="collapse navbar-collapse" id=sitenavbar><ul class="navbar-nav ml-auto main-nav"><li class=nav-item><a class=nav-link href=/>Home</a></li><li class=nav-item><a class=nav-link href=/posts>Posts</a></li><li class=nav-item><a class=nav-link href=/about>About</a></li></ul></div></div></nav><main><section class="site-blog details"><div class=container><div class="row justify-content-center"><div class=col-lg-8><article class=site-blog-details><p><span>June 4, 2023</span> by <span>Reion</span></p><h2 class=blog-title>How KDE Plasma Badge Works</h2><p>I logged into my telegram in KDE Plasma today, and found that the two are integrated so well, just like the title of this article says &ldquo;Badge&rdquo;, please see the screenshot bwlow:</p><p><img src=2023-06-04_14-09.png alt=|inline|border></p><p><img src=2023-06-04_14-11.png alt=|inline|border></p><p>When you read some messages, telegram will request to update the number of badges in the taskbar icon:</p><p><img src=2023-06-04_14-11_1.png alt=|inline|border></p><p>This all looks perfect and got my attention, so how does it work?</p><p>Let&rsquo;s first determine what D-Bus(the Linux desktop environment is all D-Bus communication) interface to transmit data, and the <code>dbus-monitor</code> tool can be used to monitor the transmitted content.</p><pre tabindex=0><code>signal time=1685861701.302893 sender=:1.174 -&gt; destination=(null destination) serial=353 path=/com/canonical/unity/launcherentry/2857096580; interface=com.canonical.Unity.LauncherEntry; member=Update
+   string &#34;application://telegramdesktop.desktop&#34;
+   array [
+      dict entry(
+         string &#34;count&#34;
+         variant             int64 1498
+      )
+      dict entry(
+         string &#34;count-visible&#34;
+         variant             boolean true
+      )
+   ]
+</code></pre><p>Yes I found out what they transmit with dbus-monitor, using the LauncherAPI defined by Ubuntu, which is <code>com.canonical.Unity.LauncherEntry</code>, here is the official document: <a href=https://wiki.ubuntu.com/Unity/LauncherAPI target=_blank>https://wiki.ubuntu.com/Unity/LauncherAPI</a></p><p>Regarding the interface specification defined by Ubuntu, I still have some impressions, which is mentioned by @probonopd, which can be found in this: <a href=https://github.com/cyberos/cyber-dock/issues/7 target=_blank>https://github.com/cyberos/cyber-dock/issues/7</a>, haha.</p><h1 id=plasma-desktop>plasma-desktop</h1><p>Let&rsquo;s get back to the topic, the implementation of Plasma is in the taskmanager module and there is a C++ class called SmartLauncherBackend.</p><p>This class calls the setupUnity() function when it is constructed, which is no doubt used to receive Update() messages from <code>com.com.canonical.Unity.LauncherEntry</code>.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#66d9ef>void</span> Backend<span style=color:#f92672>::</span>setupUnity()
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>auto</span> sessionBus <span style=color:#f92672>=</span> QDBusConnection<span style=color:#f92672>::</span>sessionBus();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>sessionBus.connect({},
+</span></span><span style=display:flex><span>                            {},
+</span></span><span style=display:flex><span>                            QStringLiteral(<span style=color:#e6db74>&#34;com.canonical.Unity.LauncherEntry&#34;</span>),
+</span></span><span style=display:flex><span>                            QStringLiteral(<span style=color:#e6db74>&#34;Update&#34;</span>),
+</span></span><span style=display:flex><span>                            <span style=color:#66d9ef>this</span>,
+</span></span><span style=display:flex><span>                            SLOT(update(QString, QMap<span style=color:#f92672>&lt;</span>QString, QVariant<span style=color:#f92672>&gt;</span>)))) {
+</span></span><span style=display:flex><span>        qWarning() <span style=color:#f92672>&lt;&lt;</span> <span style=color:#e6db74>&#34;failed to register Update signal&#34;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>sessionBus.registerObject(QStringLiteral(<span style=color:#e6db74>&#34;/Unity&#34;</span>), <span style=color:#66d9ef>this</span>)) {
+</span></span><span style=display:flex><span>        qWarning() <span style=color:#f92672>&lt;&lt;</span> <span style=color:#e6db74>&#34;Failed to register unity object&#34;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>sessionBus.registerService(QStringLiteral(<span style=color:#e6db74>&#34;com.canonical.Unity&#34;</span>))) {
+</span></span><span style=display:flex><span>        qWarning() <span style=color:#f92672>&lt;&lt;</span> <span style=color:#e6db74>&#34;Failed to register unity service&#34;</span>;
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// In case an external process uses this (e.g. Latte Dock), let it just listen.
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    ......
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>After receiving the Update signal, it&rsquo;s hard not to get it, the next thing it does is to find the icon item on the taskbar through <strong>app_uri</strong>, and then update the UI.</p><p>For more details, you can view the code, the code location is <code>plasma-desktop/applets/taskmanager/plugin/smartlaunchers /smartlauncherbackend.cpp</code>.</p><h1 id=how-does-telegram-send>How does Telegram send?</h1><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#66d9ef>void</span> MainWindow<span style=color:#f92672>::</span>updateUnityCounter() {
+</span></span><span style=display:flex><span><span style=color:#75715e>#if QT_VERSION &gt;= QT_VERSION_CHECK(6, 6, 0)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	qApp<span style=color:#f92672>-&gt;</span>setBadgeNumber(Core<span style=color:#f92672>::</span>App().unreadBadge());
+</span></span><span style=display:flex><span><span style=color:#75715e>#else </span><span style=color:#75715e>// Qt &gt;= 6.6.0
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>	<span style=color:#66d9ef>static</span> <span style=color:#66d9ef>const</span> <span style=color:#66d9ef>auto</span> djbStringHash <span style=color:#f92672>=</span> [](<span style=color:#66d9ef>const</span> std<span style=color:#f92672>::</span>string <span style=color:#f92672>&amp;</span>string) {
+</span></span><span style=display:flex><span>		uint hash <span style=color:#f92672>=</span> <span style=color:#ae81ff>5381</span>;
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>for</span> (<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>auto</span> <span style=color:#f92672>&amp;</span>curChar : string) {
+</span></span><span style=display:flex><span>			hash <span style=color:#f92672>=</span> (hash <span style=color:#f92672>&lt;&lt;</span> <span style=color:#ae81ff>5</span>) <span style=color:#f92672>+</span> hash <span style=color:#f92672>+</span> curChar;
+</span></span><span style=display:flex><span>		}
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>return</span> hash;
+</span></span><span style=display:flex><span>	};
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>auto</span> launcherUrl <span style=color:#f92672>=</span> Glib<span style=color:#f92672>::</span>ustring(
+</span></span><span style=display:flex><span>		<span style=color:#e6db74>&#34;application://&#34;</span>
+</span></span><span style=display:flex><span>			<span style=color:#f92672>+</span> QGuiApplication<span style=color:#f92672>::</span>desktopFileName().toStdString());
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>auto</span> counterSlice <span style=color:#f92672>=</span> std<span style=color:#f92672>::</span>min(Core<span style=color:#f92672>::</span>App().unreadBadge(), <span style=color:#ae81ff>9999</span>);
+</span></span><span style=display:flex><span>	std<span style=color:#f92672>::</span>map<span style=color:#f92672>&lt;</span>Glib<span style=color:#f92672>::</span>ustring, Glib<span style=color:#f92672>::</span>VariantBase<span style=color:#f92672>&gt;</span> dbusUnityProperties;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>if</span> (counterSlice <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>		<span style=color:#75715e>// According to the spec, it should be of &#39;x&#39; D-Bus signature,
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		<span style=color:#75715e>// which corresponds to signed 64-bit integer
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		<span style=color:#75715e>// https://wiki.ubuntu.com/Unity/LauncherAPI#Low_level_DBus_API:_com.canonical.Unity.LauncherEntry
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>		dbusUnityProperties[<span style=color:#e6db74>&#34;count&#34;</span>] <span style=color:#f92672>=</span> Glib<span style=color:#f92672>::</span>Variant<span style=color:#f92672>&lt;</span>int64<span style=color:#f92672>&gt;::</span>create(
+</span></span><span style=display:flex><span>			counterSlice);
+</span></span><span style=display:flex><span>		dbusUnityProperties[<span style=color:#e6db74>&#34;count-visible&#34;</span>] <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>			Glib<span style=color:#f92672>::</span>Variant<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>bool</span><span style=color:#f92672>&gt;::</span>create(true);
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>		dbusUnityProperties[<span style=color:#e6db74>&#34;count-visible&#34;</span>] <span style=color:#f92672>=</span>
+</span></span><span style=display:flex><span>			Glib<span style=color:#f92672>::</span>Variant<span style=color:#f92672>&lt;</span><span style=color:#66d9ef>bool</span><span style=color:#f92672>&gt;::</span>create(false);
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>	<span style=color:#66d9ef>try</span> {
+</span></span><span style=display:flex><span>		<span style=color:#66d9ef>const</span> <span style=color:#66d9ef>auto</span> connection <span style=color:#f92672>=</span> Gio<span style=color:#f92672>::</span>DBus<span style=color:#f92672>::</span>Connection<span style=color:#f92672>::</span>get_sync(
+</span></span><span style=display:flex><span>			Gio<span style=color:#f92672>::</span>DBus<span style=color:#f92672>::</span>BusType<span style=color:#f92672>::</span>SESSION);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>		connection<span style=color:#f92672>-&gt;</span>emit_signal(
+</span></span><span style=display:flex><span>			<span style=color:#e6db74>&#34;/com/canonical/unity/launcherentry/&#34;</span>
+</span></span><span style=display:flex><span>				<span style=color:#f92672>+</span> std<span style=color:#f92672>::</span>to_string(djbStringHash(launcherUrl)),
+</span></span><span style=display:flex><span>			<span style=color:#e6db74>&#34;com.canonical.Unity.LauncherEntry&#34;</span>,
+</span></span><span style=display:flex><span>			<span style=color:#e6db74>&#34;Update&#34;</span>,
+</span></span><span style=display:flex><span>			{},
+</span></span><span style=display:flex><span>			base<span style=color:#f92672>::</span>Platform<span style=color:#f92672>::</span>MakeGlibVariant(std<span style=color:#f92672>::</span>tuple{
+</span></span><span style=display:flex><span>				launcherUrl,
+</span></span><span style=display:flex><span>				dbusUnityProperties,
+</span></span><span style=display:flex><span>			}));
+</span></span><span style=display:flex><span>	} <span style=color:#66d9ef>catch</span> (...) {
+</span></span><span style=display:flex><span>	}
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif </span><span style=color:#75715e>// Qt &lt; 6.6.0
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span></code></pre></div><p>We can see that Telegram did it in <code>MainWindow::updateUnityCounter()</code>. It seems easy, and the interesting thing is that Qt also supports this feature on version 6.5 or higher.</p><p>Next, let&rsquo;s look at how this is implemented in Qt.</p><h1 id=qt>Qt</h1><p>According to the official document, Qt added the <code>setBadgeNumber</code> method in 6.5, which can facilitate the application to set the number of badge.</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#75715e>/*!
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    Sets the application&#39;s badge to \a number.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    Useful for providing feedback to the user about the number
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    of unread messages or similar.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    The badge will be overlaid on the application&#39;s icon in the Dock
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    on \macos, the home screen icon on iOS, or the task bar on Windows
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    and Linux.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    If the number is outside the range supported by the platform, the
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    number will be clamped to the supported range. If the number does
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    not fit within the badge, the number may be visually elided.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    Setting the number to 0 will clear the badge.
+</span></span></span><span style=display:flex><span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    \since 6.5
+</span></span></span><span style=display:flex><span><span style=color:#75715e>    \sa applicationName
+</span></span></span><span style=display:flex><span><span style=color:#75715e>*/</span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>void</span> QGuiApplication<span style=color:#f92672>::</span>setBadgeNumber(qint64 number)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    QGuiApplicationPrivate<span style=color:#f92672>::</span>platformIntegration()<span style=color:#f92672>-&gt;</span>setApplicationBadge(number);
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><p>Qt has different implementations on different platforms, it makes good use of abstract concepts, and in Linux it is implemented in <code>QGenericUnixServices::setApplicationBadge()</code></p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#66d9ef>void</span> QGenericUnixServices<span style=color:#f92672>::</span>setApplicationBadge(qint64 number)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span><span style=color:#75715e>#if QT_CONFIG(dbus)
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (qGuiApp<span style=color:#f92672>-&gt;</span>desktopFileName().isEmpty()) {
+</span></span><span style=display:flex><span>        qWarning(<span style=color:#e6db74>&#34;QGuiApplication::desktopFileName() is empty&#34;</span>);
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> QString launcherUrl <span style=color:#f92672>=</span> QStringLiteral(<span style=color:#e6db74>&#34;application://&#34;</span>) <span style=color:#f92672>+</span> qGuiApp<span style=color:#f92672>-&gt;</span>desktopFileName() <span style=color:#f92672>+</span> QStringLiteral(<span style=color:#e6db74>&#34;.desktop&#34;</span>);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>const</span> qint64 count <span style=color:#f92672>=</span> qBound(<span style=color:#ae81ff>0</span>, number, <span style=color:#ae81ff>9999</span>);
+</span></span><span style=display:flex><span>    QVariantMap dbusUnityProperties;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>if</span> (count <span style=color:#f92672>&gt;</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>        dbusUnityProperties[QStringLiteral(<span style=color:#e6db74>&#34;count&#34;</span>)] <span style=color:#f92672>=</span> count;
+</span></span><span style=display:flex><span>        dbusUnityProperties[QStringLiteral(<span style=color:#e6db74>&#34;count-visible&#34;</span>)] <span style=color:#f92672>=</span> true;
+</span></span><span style=display:flex><span>    } <span style=color:#66d9ef>else</span> {
+</span></span><span style=display:flex><span>        dbusUnityProperties[QStringLiteral(<span style=color:#e6db74>&#34;count-visible&#34;</span>)] <span style=color:#f92672>=</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>auto</span> signal <span style=color:#f92672>=</span> QDBusMessage<span style=color:#f92672>::</span>createSignal(QStringLiteral(<span style=color:#e6db74>&#34;/com/canonical/unity/launcherentry/&#34;</span>)
+</span></span><span style=display:flex><span>        <span style=color:#f92672>+</span> qGuiApp<span style=color:#f92672>-&gt;</span>applicationName(), QStringLiteral(<span style=color:#e6db74>&#34;com.canonical.Unity.LauncherEntry&#34;</span>), QStringLiteral(<span style=color:#e6db74>&#34;Update&#34;</span>));
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    signal.setArguments({launcherUrl, dbusUnityProperties});
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    QDBusConnection<span style=color:#f92672>::</span>sessionBus().send(signal);
+</span></span><span style=display:flex><span><span style=color:#75715e>#else
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    Q_UNUSED(number)
+</span></span><span style=display:flex><span><span style=color:#75715e>#endif
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>}
+</span></span></code></pre></div><p>It&rsquo;s all unified.</p><h1 id=chromium--electron>Chromium & Electron</h1><p><a href="https://source.chromium.org/chromium/chromium/src/+/refs/heads/main:chrome/browser/download/download_status_updater_linux.cc;l=50;drc=7825e28a1c167e3ef7da2f1ec48dfa4be818945d;bpv=0;bpt=1" target=_blank>Chromium code</a></p><p><a href=https://github.com/electron/electron/blob/05db963f874051475e91179d68d98680232cd5ea/shell/browser/browser_linux.cc#L129 target=_blank>Electron</a></p><p>Unity Badge Count implementation: <a href=https://github.com/electron/electron/issues/16001 target=_blank>https://github.com/electron/electron/issues/16001</a></p></article></div></div></div></section><section class="site-blog details"><div class=container id=reion_blog_comments><div class="row justify-content-center"></div></div></section><script>const isDarkTheme=document.querySelector("body").classList.contains("theme-dark"),themeName=isDarkTheme?"dark":"light_protanopia",com_script=document.createElement("script");com_script.src="https://giscus.app/client.js",com_script.dataset.repo="reionwong/blog_comments",com_script.dataset.repoId="R_kgDOJrDnMQ",com_script.dataset.category="General",com_script.dataset.categoryId="DIC_kwDOJrDnMc4CW8lY",com_script.dataset.mapping="pathname",com_script.dataset.strict="0",com_script.dataset.reactionsEnabled="1",com_script.dataset.emitMetadata="0",com_script.dataset.inputPosition="bottom",com_script.dataset.theme=themeName,com_script.dataset.lang="en",com_script.dataset.loading="lazy",com_script.crossOrigin="anonymous",com_script.async=!0,document.getElementById("reion_blog_comments").appendChild(com_script)</script></main><footer class=site-footer><div class=container><div class=row><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Contact Info</h5><p class=site-footer-widget-description>reionwong@gmail.com<br><a href=tel:></a><br><a href=mailto:></a></p></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Sitemap</h5><ul class=site-footer-widget-links><li><a href=/about>About</a></li></ul></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Related</h5><ul class=site-footer-widget-links><li><a href=https://github.com/reionwong target=_blank>Github</a></li><li><a href=https://twitter.com/reionwong target=_blank>Twitter</a></li></ul></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Blogroll</h5><ul class=site-footer-widget-links><li><a href=https://felixc.at/ target=_blank>Felix’s Blog</a></li><li><a href=https://blog.han-li.cn/ target=_blank>Han Li’s Blog</a></li><li><a href=https://hiif.ong/ target=_blank>hiifong</a></li></ul></div></div><div class="col-lg-2 col-12"><a href=#top class=site-footer-widget-top><img src=/images/to-top.svg alt=back-to-top><p>To the top</p></a></div><div class=col-12><div class=site-footer-copyright><p>© Copyright 2024 - All Rights Reserved by Reion Wong</p></div></div></div></div></footer><script src=/js/vendor.min.js></script><script src=/js/script.min.js></script></body></html>

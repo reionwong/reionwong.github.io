@@ -1,0 +1,72 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><title>深度文件管理器文件拷贝原理 - Reion's Think</title>
+<meta name=viewport content="width=device-width,initial-scale=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=author content="StaticMania"><meta name=generator content="Hugo 0.123.2"><link rel=stylesheet href=/css/bootstrap.min.css><link rel=stylesheet href=/font-awesome/css/font-awesome.min.css><link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;500;600;700" rel=stylesheet><link href=/scss/style.min.css rel=stylesheet><link rel="shortcut icon" href=/images/logo.svg type=image/x-icon><link rel=icon href=/images/logo.svg type=image/x-icon></head><body><nav class="navbar navbar-expand-lg site-navigation"><div class=container><a class=navbar-brand href=/><img src=/images/logo.svg alt=logo>
+</a><button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span></button><div class="collapse navbar-collapse" id=sitenavbar><ul class="navbar-nav ml-auto main-nav"><li class=nav-item><a class=nav-link href=/>Home</a></li><li class=nav-item><a class=nav-link href=/posts>Posts</a></li><li class=nav-item><a class=nav-link href=/about>About</a></li></ul></div></div></nav><main><section class="site-blog details"><div class=container><div class="row justify-content-center"><div class=col-lg-8><article class=site-blog-details><p><span>October 2, 2018</span> by <span>Reion</span></p><h2 class=blog-title>深度文件管理器文件拷贝原理</h2><p>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。</p><p>大概是这么一个流程：</p><ul><li>传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir)</li><li>求出目标文件完整地址：目标目录 + 源文件名，targetPath = tarDir + fromPath.fileName()</li><li>定义了写入数据块大小：DATA_BLOCK_SIZE 为 65536</li><li>创建两个 QFile 对象（源文件地址与目标文件地址）</li><li>调用 QFile::open() 方法，源文件打开模式为只读（ReadOnly），目标文件打开模式为只写（WriteOnly）</li><li>调用 QIODevice::read() 方法，每次读取一块字节数据，会返回读取的字节数（如果为0则代表拷贝成功，-1 说明失败）</li><li>调用 QIODevice::write() 循环写入一个数据块，也会返回写入的字节数，如果为0就会停止循环，说明文件拷贝成功</li></ul><p>使用 Qt 读写类 QFile 来进行文件读写操作，都会调用到系统 open、read、write&mldr;</p><p>计算拷贝文件百分比进度也很简单，在写入过程中把已写入字节数存储，已写入字节数 / 总字节数 * 100.0 就是当前拷贝文件的进度，计算的公式也就是：</p><p><code>percent = bytesCopied / TotalByte * 100.0</code></p><h2 id=拷贝文件简单实现>拷贝文件简单实现</h2><p>根据 dde-file-manager 代码逻辑写一个简单的。</p><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-c++ data-lang=c++><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;QFile&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e>#include</span> <span style=color:#75715e>&lt;QFileInfo&gt;</span><span style=color:#75715e>
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#75715e>#define DATA_BLOCK_SIZE 1000
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>
+</span></span><span style=display:flex><span><span style=color:#66d9ef>bool</span> <span style=color:#a6e22e>copyFile</span>(<span style=color:#66d9ef>const</span> QString <span style=color:#f92672>&amp;</span>fromPath, <span style=color:#66d9ef>const</span> QString <span style=color:#f92672>&amp;</span>targetDir)
+</span></span><span style=display:flex><span>{
+</span></span><span style=display:flex><span>    QFileInfo fromFileInfo(fromPath);
+</span></span><span style=display:flex><span>    QString targetPath <span style=color:#f92672>=</span> QString(<span style=color:#e6db74>&#34;%1/%2&#34;</span>).arg(targetDir).arg(fromFileInfo.fileName());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    QFile fromFile(fromPath);
+</span></span><span style=display:flex><span>    QFile targetFile(targetPath);
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>char</span> dataBuffer[DATA_BLOCK_SIZE];
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    quint64 bytesCopied <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span>;
+</span></span><span style=display:flex><span>    quint64 totalByte <span style=color:#f92672>=</span> fromFile.size();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// 如果源文件不可读直接返回 false
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>fromFile.open(QIODevice<span style=color:#f92672>::</span>ReadOnly)) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#75715e>// 如果目标文件不可写直接返回 false
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>    <span style=color:#66d9ef>if</span> (<span style=color:#f92672>!</span>targetFile.open(QIODevice<span style=color:#f92672>::</span>WriteOnly)) {
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>while</span> (true) {
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// 读取一段数据块
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        qint64 inBytes <span style=color:#f92672>=</span> fromFile.read(dataBuffer, DATA_BLOCK_SIZE);
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>if</span> (inBytes <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>) {
+</span></span><span style=display:flex><span>            fromFile.close();
+</span></span><span style=display:flex><span>            targetFile.close();
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// 写入完成后设置目标文件的权限
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#75715e>// 保持目标文件与源文件权限是一致的
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            targetFile.setPermissions(fromFile.permissions());
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> true;
+</span></span><span style=display:flex><span>        } <span style=color:#66d9ef>else</span> <span style=color:#66d9ef>if</span> (inBytes <span style=color:#f92672>==</span> <span style=color:#f92672>-</span><span style=color:#ae81ff>1</span>) {
+</span></span><span style=display:flex><span>            fromFile.close();
+</span></span><span style=display:flex><span>            targetFile.close();
+</span></span><span style=display:flex><span>            <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        qint64 availableBytes <span style=color:#f92672>=</span> inBytes;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#66d9ef>while</span> (true) {
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// 写入一段数据块
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            qint64 writtenBytes <span style=color:#f92672>=</span> targetFile.write(dataBuffer, availableBytes);
+</span></span><span style=display:flex><span>            availableBytes <span style=color:#f92672>=</span> availableBytes <span style=color:#f92672>-</span> writtenBytes;
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>            <span style=color:#75715e>// 一段数据块写入完成后终止循环
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>            <span style=color:#66d9ef>if</span> (writtenBytes <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span> <span style=color:#f92672>&amp;&amp;</span> availableBytes <span style=color:#f92672>==</span> <span style=color:#ae81ff>0</span>){
+</span></span><span style=display:flex><span>                <span style=color:#66d9ef>break</span>;
+</span></span><span style=display:flex><span>            }
+</span></span><span style=display:flex><span>        }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>        <span style=color:#75715e>// 输出百分比进度
+</span></span></span><span style=display:flex><span><span style=color:#75715e></span>        bytesCopied <span style=color:#f92672>+=</span> inBytes;
+</span></span><span style=display:flex><span>        qDebug() <span style=color:#f92672>&lt;&lt;</span> bytesCopied <span style=color:#f92672>/</span> totalByte <span style=color:#f92672>*</span> <span style=color:#ae81ff>100.0</span>;
+</span></span><span style=display:flex><span>    }
+</span></span><span style=display:flex><span>
+</span></span><span style=display:flex><span>    <span style=color:#66d9ef>return</span> false;
+</span></span><span style=display:flex><span>}
+</span></span></code></pre></div><h2 id=拷贝文件夹>拷贝文件夹</h2><p>拷贝文件夹通过遍历文件夹每个文件然后调用 copyFile() 进行拷贝操作。</p><p>遍历目录拷贝文件之前根据 inode 对所有文件进行一次排序，然后再进行拷贝操作。</p><h2 id=linux-零拷贝技术>Linux 零拷贝技术</h2><p>Linux 中提供类似的系统调用主要有 sendfile()、mmap() 和splice()</p><p>参考：<a href=http://abcdxyzk.github.io/blog/2015/05/07/kernel-mm-splice/ target=_blank>Linux 中的零拷贝技术 splice</a></p><h2 id=最后>最后</h2><p>具体代码实现请看：<a href=https://github.com/linuxdeepin/dde-file-manager/blob/e8bd4a23647eee871ad1caf8c10c465be2dbd6e7/fileoperations/filejob.cpp#L833 target=_blank>filejob.cpp</a></p></article></div></div></div></section><section class="site-blog details"><div class=container id=reion_blog_comments><div class="row justify-content-center"></div></div></section><script>const isDarkTheme=document.querySelector("body").classList.contains("theme-dark"),themeName=isDarkTheme?"dark":"light_protanopia",com_script=document.createElement("script");com_script.src="https://giscus.app/client.js",com_script.dataset.repo="reionwong/blog_comments",com_script.dataset.repoId="R_kgDOJrDnMQ",com_script.dataset.category="General",com_script.dataset.categoryId="DIC_kwDOJrDnMc4CW8lY",com_script.dataset.mapping="pathname",com_script.dataset.strict="0",com_script.dataset.reactionsEnabled="1",com_script.dataset.emitMetadata="0",com_script.dataset.inputPosition="bottom",com_script.dataset.theme=themeName,com_script.dataset.lang="en",com_script.dataset.loading="lazy",com_script.crossOrigin="anonymous",com_script.async=!0,document.getElementById("reion_blog_comments").appendChild(com_script)</script></main><footer class=site-footer><div class=container><div class=row><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Contact Info</h5><p class=site-footer-widget-description>reionwong@gmail.com<br><a href=tel:></a><br><a href=mailto:></a></p></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Sitemap</h5><ul class=site-footer-widget-links><li><a href=/about>About</a></li></ul></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Related</h5><ul class=site-footer-widget-links><li><a href=https://github.com/reionwong target=_blank>Github</a></li><li><a href=https://twitter.com/reionwong target=_blank>Twitter</a></li></ul></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Blogroll</h5><ul class=site-footer-widget-links><li><a href=https://felixc.at/ target=_blank>Felix’s Blog</a></li><li><a href=https://blog.han-li.cn/ target=_blank>Han Li’s Blog</a></li><li><a href=https://hiif.ong/ target=_blank>hiifong</a></li></ul></div></div><div class="col-lg-2 col-12"><a href=#top class=site-footer-widget-top><img src=/images/to-top.svg alt=back-to-top><p>To the top</p></a></div><div class=col-12><div class=site-footer-copyright><p>© Copyright 2024 - All Rights Reserved by Reion Wong</p></div></div></div></div></footer><script src=/js/vendor.min.js></script><script src=/js/script.min.js></script></body></html>
