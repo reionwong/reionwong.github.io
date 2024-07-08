@@ -10,12 +10,4 @@ The watch has the following features:</description></item><item><title>C++ PIMPL
 介绍 Deepin 为什么喜欢造轮子？主要是为了达到深度操作系统 用户界面 / 用户体验 大统一的目标，今年的最主要目标不是造轮子，而是往系统稳定性的方向发展，所以造轮子是副业；虽然目前深度编辑器在技术方面还秒杀不了 KDE 家的 kate 编辑器，这个后面会讲到，但是在 UI/UX 这方面我觉得可以秒杀它们。
 深度编辑器定位就是简单易用、轻量级的编辑器，目标就是要替换 gedit，保持深度编辑器的 UI/UX 和深度家族整体设计语言保持一致，比如我最近一直在写博客，很多文章就是通过深度编辑器来写的；论坛里边很多用户说很少用到编辑器，也就偶尔修改配置文件和 TXT 文件的时候会用到，属于轻度使用；在编程写代码这方面环境来看，都有专属的 IDE (集成开发环境)，所以用记事本来写代码的很少吧。</description></item><item><title>深度文件管理器文件拷贝原理</title><link>/posts/deepin/dde-filemanager-cp/</link><pubDate>Tue, 02 Oct 2018 14:26:22 +0800</pubDate><guid>/posts/deepin/dde-filemanager-cp/</guid><description>看了深度文件管理器 filejob 这个模块之后，对它的拷贝文件原理也了解了一下。
 大概是这么一个流程：
-传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir) 求出目标文件完整地址：目标目录 + 源文件名，targetPath = tarDir + fromPath.fileName() 定义了写入数据块大小：DATA_BLOCK_SIZE 为 65536 创建两个 QFile 对象（源文件地址与目标文件地址） 调用 QFile::open() 方法，源文件打开模式为只读（ReadOnly），目标文件打开模式为只写（WriteOnly） 调用 QIODevice::read() 方法，每次读取一块字节数据，会返回读取的字节数（如果为0则代表拷贝成功，-1 说明失败） 调用 QIODevice::write() 循环写入一个数据块，也会返回写入的字节数，如果为0就会停止循环，说明文件拷贝成功 使用 Qt 读写类 QFile 来进行文件读写操作，都会调用到系统 open、read、write&amp;hellip;</description></item><item><title>Deepin Font Installer 设计文档</title><link>/posts/deepin/deepin-font-installer/</link><pubDate>Sat, 10 Mar 2018 18:38:20 +0800</pubDate><guid>/posts/deepin/deepin-font-installer/</guid><description>深度字体安装器主要实现字体安装、卸载、预览；安装在系统目录，可以保证系统多用户可以使用新安装的字体。
-架构设计 主要由以下三部分构成：
-deepin-font-installer 为字体安装器主进程，一共有三个页面（首页、字体信息页面、字体列表页面）构成。
-libdeepin-font-installer 为核心库，提供获取字体信息、安装、卸载、重装、预览控件接口。
-dde-font-preview-plugin 为深度文件管理器字体预览接口。
-深度字体安装器核心技术有：
-字体信息获取 预览控件实现 前端界面实现 基于DTK开发，确保基本风格和 Deepin 全家桶应用保持一致；主界面 DMainWindow 为基础，布局使用 QStackedLayout 实现多页面切换。
-拖放功能 拖放由两部分组成：拖动和释放，拖动是将被拖放对象进行移动，释放是将被拖放对象放下，其实就是鼠标左键移动和松开鼠标左键过程。
-所以就需要重写 dragEnterEvent() 和 dropEvent() 两个函数，前者为拖放进入事件，后者为释放事件，然后得到所有路径后进行处理，达到拖拽字体文件或文件夹效果，还需开启拖放功能： setAcceptDrops(true);</description></item></channel></rss>
+传入两个类型为 QString 的变量：源文件地址(fromPath)、目标目录(tarDir) 求出目标文件完整地址：目标目录 + 源文件名，targetPath = tarDir + fromPath.fileName() 定义了写入数据块大小：DATA_BLOCK_SIZE 为 65536 创建两个 QFile 对象（源文件地址与目标文件地址） 调用 QFile::open() 方法，源文件打开模式为只读（ReadOnly），目标文件打开模式为只写（WriteOnly） 调用 QIODevice::read() 方法，每次读取一块字节数据，会返回读取的字节数（如果为0则代表拷贝成功，-1 说明失败） 调用 QIODevice::write() 循环写入一个数据块，也会返回写入的字节数，如果为0就会停止循环，说明文件拷贝成功 使用 Qt 读写类 QFile 来进行文件读写操作，都会调用到系统 open、read、write&amp;hellip;</description></item></channel></rss>
