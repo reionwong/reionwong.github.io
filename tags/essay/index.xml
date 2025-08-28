@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Essay on Reion's Think</title><link>/tags/essay/</link><description>Recent content in Essay on Reion's Think</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Thu, 08 Dec 2022 00:30:29 +0800</lastBuildDate><atom:link href="/tags/essay/index.xml" rel="self" type="application/rss+xml"/><item><title>QQ for Linux 官方版本终于能用了</title><link>/posts/linux/qq-for-linux/</link><pubDate>Thu, 08 Dec 2022 00:30:29 +0800</pubDate><guid>/posts/linux/qq-for-linux/</guid><description>&lt;p>最早在 2019 年参加某个会时，就打听到了 QQ 已经在规划使用 Electron 技术进行重写 Linux 版，两年过去了，直到今年 12.7 开始公测，需要加群才能登陆&lt;/p>
-&lt;p>&lt;img src="Screenshot_20221208_004141.png" alt="|border|real">&lt;/p>
-&lt;p>依旧是仅支持扫码登陆，不过还好，我已经忘记了自己的 QQ 密码了 (&lt;/p>
-&lt;p>&lt;img src="Screenshot_20221208_004623.png" alt="|border">&lt;/p>
-&lt;p>&lt;img src="Screenshot_20221208_004811.png" alt="|border">&lt;/p>
-&lt;h2 id="优点">优点&lt;/h2>
-&lt;ul>
-&lt;li>与 macOS 版 QQ UI 保持统一设计语言&lt;/li>
-&lt;li>支持 Dark Mode 和 Light Mode 主题切换&lt;/li>
-&lt;li>表情包、emoji 可正常使用&lt;/li>
-&lt;li>在 x 窗管下可截图，wayland 没试过&lt;/li>
-&lt;li>手机上可识别登陆设备为 Linux&lt;/li>
-&lt;/ul>
-&lt;h2 id="吐槽">吐槽&lt;/h2>
-&lt;ul>
-&lt;li>点击关闭按钮是相应的动作是最小化，倒是加托盘啊&amp;hellip;&lt;/li>
-&lt;li>外观跟随系统如何响应，试了下修改 gtk 主题无法响应&amp;hellip;&lt;/li>
-&lt;li>无法跨设备传文件、发送消息&lt;/li>
-&lt;/ul></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Essay on Reion's Think</title><link>/tags/essay/</link><description>Recent content in Essay on Reion's Think</description><generator>Hugo</generator><language>en-us</language><lastBuildDate>Thu, 08 Dec 2022 00:30:29 +0800</lastBuildDate><atom:link href="/tags/essay/index.xml" rel="self" type="application/rss+xml"/><item><title>QQ for Linux 官方版本终于能用了</title><link>/posts/linux/qq-for-linux/</link><pubDate>Thu, 08 Dec 2022 00:30:29 +0800</pubDate><guid>/posts/linux/qq-for-linux/</guid><description>&lt;p&gt;最早在 2019 年参加某个会时，就打听到了 QQ 已经在规划使用 Electron 技术进行重写 Linux 版，两年过去了，直到今年 12.7 开始公测，需要加群才能登陆&lt;/p&gt;
+&lt;p&gt;&lt;img src="Screenshot_20221208_004141.png" alt="|border|real"&gt;&lt;/p&gt;
+&lt;p&gt;依旧是仅支持扫码登陆，不过还好，我已经忘记了自己的 QQ 密码了 (&lt;/p&gt;
+&lt;p&gt;&lt;img src="Screenshot_20221208_004623.png" alt="|border"&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="Screenshot_20221208_004811.png" alt="|border"&gt;&lt;/p&gt;
+&lt;h2 id="优点"&gt;优点&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;与 macOS 版 QQ UI 保持统一设计语言&lt;/li&gt;
+&lt;li&gt;支持 Dark Mode 和 Light Mode 主题切换&lt;/li&gt;
+&lt;li&gt;表情包、emoji 可正常使用&lt;/li&gt;
+&lt;li&gt;在 x 窗管下可截图，wayland 没试过&lt;/li&gt;
+&lt;li&gt;手机上可识别登陆设备为 Linux&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="吐槽"&gt;吐槽&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;点击关闭按钮是相应的动作是最小化，倒是加托盘啊&amp;hellip;&lt;/li&gt;
+&lt;li&gt;外观跟随系统如何响应，试了下修改 gtk 主题无法响应&amp;hellip;&lt;/li&gt;
+&lt;li&gt;无法跨设备传文件、发送消息&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
